@@ -48,7 +48,7 @@ func (sm *SafeMap) LoopDel(isDel func(k, v interface{}) bool) {
 	sm.lock.Lock()
 	for k, v := range sm.mp {
 		if isDel(k, v) {
-			sm.Del(k)
+			delete(sm.mp, k)
 		}
 	}
 	sm.lock.Unlock()
