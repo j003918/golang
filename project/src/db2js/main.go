@@ -34,6 +34,7 @@ var (
 )
 
 func init() {
+	os.Setenv("NLS_LANG", "AMERICAN_AMERICA.AL32UTF8")
 	cmdArgs = make(map[string]string)
 	tls := flag.Int("tls", 0, "0:disable 1:enable")
 	port := flag.Int("port", 80, "http:80 https:443")
@@ -100,12 +101,20 @@ func main() {
 func guestlogin(w http.ResponseWriter, r *http.Request) {
 	r.ParseForm()
 	user := r.FormValue("user")
+	//user := r.Header.Get("x-auth-user")
 	pass := r.FormValue("pass")
 
-	if !AddAuth(r.RemoteAddr, user, pass) {
-		w.Write([]byte("User Name or Password does not exist"))
+	strIP := r.RemoteAddr
+	index := strings.LastIndexAny(strIP, ":")
+	if index > 0 {
+		strIP = string([]rune(strIP)[0:index])
+	}
+
+	if !AddAuth(strIP, user, pass) {
+		w.WriteHeader(401)
+		w.Write([]byte(http.StatusText(401)))
 	} else {
-		w.Write([]byte("ok"))
+		w.Write([]byte(http.StatusText(200)))
 	}
 }
 
@@ -129,6 +138,8 @@ func isLoop(k, v interface{}) bool {
 }
 
 func listMethod(w http.ResponseWriter, r *http.Request) {
+	w.WriteHeader(401)
+	w.Write([]byte(http.StatusText(401)))
 	//signMap.Loop(isLoop)
 
 	//	strTmp := ""
@@ -160,13 +171,18 @@ func worker(w http.ResponseWriter, r *http.Request) {
 	defer decGuest()
 	r.ParseForm()
 
-	w.Header().Set("Content-Type", "application/json; charset=utf-8")
 	user := r.Form.Get("user")
 	//user := r.Header.Get("x-auth-user")
 
-	if !CheckAuth(r.RemoteAddr, user) {
-		strJson := `{"result":"` + Code401 + `",` + `"msg":"` + Code401Msg + `", "data": null}`
-		w.Write([]byte(strJson))
+	strIP := r.RemoteAddr
+	index := strings.LastIndexAny(strIP, ":")
+	if index > 0 {
+		strIP = string([]rune(strIP)[0:index])
+	}
+
+	if !CheckAuth(strIP, user) {
+		w.WriteHeader(401)
+		w.Write([]byte(http.StatusText(401)))
 		return
 	}
 
@@ -176,8 +192,8 @@ func worker(w http.ResponseWriter, r *http.Request) {
 	if MapMethod.Check(strCmd) {
 		strSql = MapMethod.Get(strCmd).(*MethdContent).Content
 	} else {
-		strJson := `{"result":"` + Code400 + `",` + `"msg":"` + Code400Msg + `", "data": null}`
-		w.Write([]byte(strJson))
+		w.WriteHeader(404)
+		w.Write([]byte(http.StatusText(404)))
 		return
 	}
 
@@ -185,51 +201,32 @@ func worker(w http.ResponseWriter, r *http.Request) {
 		strSql = strings.Replace(strSql, "#"+k+"#", r.Form.Get(k), -1)
 	}
 
-	strRst := Code400
-	strMsg := Code400Msg
-	strVal := ""
 	var err error
 	var bufdata bytes.Buffer
 
-	if strCmd == "" || strSql == "" || strings.ContainsAny(strSql, "#") {
-		strRst = Code400
-		strMsg = Code400Msg
-		strVal = "null"
-	} else {
-		ctx, _ := context.WithTimeout(context.Background(), timeout)
-		err = sql2json.GetJson(ctx, MapMethod.Get(strCmd).(*MethdContent).Mthdb, strSql, &bufdata)
-		if nil != err {
-			strRst = Code500
-			strMsg = err.Error()
-			strVal = "null"
-		} else {
-			strRst = Code200
-			strMsg = Code200Msg
-		}
+	if strings.ContainsAny(strSql, "#") {
+		w.WriteHeader(400)
+		w.Write([]byte(http.StatusText(400)))
+		return
+	}
+	ctx, _ := context.WithTimeout(context.Background(), timeout)
+	err = sql2json.GetJson(ctx, MapMethod.Get(strCmd).(*MethdContent).DBConn, strSql, &bufdata)
+	if nil != err {
+		w.WriteHeader(500)
+		w.Write([]byte(http.StatusText(500)))
+		return
 	}
 
-	var json_buf bytes.Buffer
-	json_buf.WriteString(`{"result":` + strRst + ",")
-	json_buf.WriteString(`"msg":"` + strMsg + `",`)
-	json_buf.WriteString(`"data":`)
-	if "" == strVal {
-		json_buf.Write(bufdata.Bytes())
-	} else {
-		json_buf.WriteString(strVal)
-	}
-	json_buf.WriteString("}")
+	w.Header().Set("Content-Type", "application/json; charset=utf-8")
+	w.Header().Set("Connection", "close")
+	w.Header().Set("CharacterEncoding", "utf-8")
+	w.Header().Set("Pragma", "no-cache")
+	w.Header().Set("Cache-Control", "no-cache, no-store, max-age=0")
 
-	//w.Header().Set("Connection", "close")
-	//w.Header().Set("CharacterEncoding", "utf-8")
-	//w.Header().Set("Content-Type", "application/json; charset=utf-8")
-	//w.Header().Set("Pragma", "no-cache")
-	//w.Header().Set("Cache-Control", "no-cache, no-store, max-age=0")
-	//w.Header().Set("Expires", "1L")
-
-	if strings.Contains(r.Header.Get("Accept-Encoding"), "gzip") && json_buf.Len() >= 1024 {
+	if strings.Contains(r.Header.Get("Accept-Encoding"), "gzip") && bufdata.Len() >= 1024*10 {
 		var gzbuf bytes.Buffer
 		gz := gzip.NewWriter(&gzbuf)
-		_, err = gz.Write(json_buf.Bytes())
+		_, err = gz.Write(bufdata.Bytes())
 		gz.Close()
 		if err == nil {
 			w.Header().Set("Content-Encoding", "gzip")
@@ -237,10 +234,9 @@ func worker(w http.ResponseWriter, r *http.Request) {
 			w.Write(gzbuf.Bytes())
 		} else {
 			fmt.Println(err.Error())
-			w.Write(json_buf.Bytes())
-			return
+			w.Write(bufdata.Bytes())
 		}
 	} else {
-		w.Write(json_buf.Bytes())
+		w.Write(bufdata.Bytes())
 	}
 }

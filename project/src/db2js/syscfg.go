@@ -52,7 +52,10 @@ var (
 type MethdContent struct {
 	Method  string
 	Content string
-	Mthdb   *sql.DB
+	DBConn  *sql.DB
+}
+
+type DB2HttpJS struct {
 }
 
 func init() {
@@ -165,10 +168,10 @@ func setupMethod() {
 		}
 
 		if !MapMethod.Check(method) {
-			mc := MethdContent{Method: "", Content: "", Mthdb: nil}
+			mc := MethdContent{Method: "", Content: "", DBConn: nil}
 			mc.Method = method
 			mc.Content = content
-			mc.Mthdb = MapDbDriver.Get(dsn_id).(*sql.DB)
+			mc.DBConn = MapDbDriver.Get(dsn_id).(*sql.DB)
 			MapMethod.Set(method, &mc)
 			fmt.Println("load method ", method)
 		}
