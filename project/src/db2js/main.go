@@ -61,14 +61,8 @@ func main() {
 
 	http.Handle("/", http.FileServer(http.Dir("./html/")))
 	http.HandleFunc("/get", worker)
-
-	http.HandleFunc("/info/service", listMethod)
 	http.HandleFunc("/info/online", activeGuest)
-
 	http.HandleFunc("/auth/login", guestlogin)
-
-	http.HandleFunc("/cfg", setConfig)
-	http.HandleFunc("/m/del", delMethod)
 
 	srv := &http.Server{
 		Addr:           listen_addr,
@@ -116,37 +110,6 @@ func guestlogin(w http.ResponseWriter, r *http.Request) {
 	} else {
 		w.Write([]byte(http.StatusText(200)))
 	}
-}
-
-func setConfig(w http.ResponseWriter, r *http.Request) {
-	r.ParseForm()
-	cfgKey := r.Form.Get("k")
-	cfgVal := r.Form.Get("v")
-	if _, ok := cmdArgs[cfgKey]; ok {
-		cmdArgs[cfgKey] = cfgVal
-	}
-}
-
-func delMethod(w http.ResponseWriter, r *http.Request) {
-	//r.ParseForm()
-	//delete(methodSql, r.Form.Get("m"))
-}
-
-func isLoop(k, v interface{}) bool {
-	fmt.Println(k.(string))
-	return false
-}
-
-func listMethod(w http.ResponseWriter, r *http.Request) {
-	w.WriteHeader(401)
-	w.Write([]byte(http.StatusText(401)))
-	//signMap.Loop(isLoop)
-
-	//	strTmp := ""
-	//	for k, v := range methodSql {
-	//		strTmp += k + "{" + string('\n') + v + string('\n') + "}" + strings.Repeat(string('\n'), 2)
-	//	}
-	//	w.Write([]byte(strTmp))
 }
 
 func activeGuest(w http.ResponseWriter, r *http.Request) {

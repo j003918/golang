@@ -4,7 +4,6 @@ package main
 import (
 	"crypto/md5"
 	"encoding/hex"
-	"fmt"
 	"strings"
 	"time"
 
@@ -35,7 +34,6 @@ func init() {
 
 func loop(k, v interface{}) bool {
 	if time.Now().Unix()-v.(int64) >= KnockOutTime {
-		fmt.Println("knockout ", k.(string))
 		return true
 	}
 	return false
@@ -70,7 +68,6 @@ func AddAuth(guestIP, user, pass string) bool {
 		return false
 	}
 
-	fmt.Println("add ", guestIP, user, strSign)
 	signMap.Set(strSign, time.Now().Unix())
 	return true
 }
@@ -81,7 +78,6 @@ func CheckAuth(guestIP, user string) bool {
 	if !ok {
 		return false
 	}
-	fmt.Println("check sign ", guestIP, user, strSign)
 	//return signMap.Check(strSign)
 	return signMap.CheckWithUpdate(strSign, time.Now().Unix())
 }
