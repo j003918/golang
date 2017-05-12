@@ -23,8 +23,6 @@ import (
 	"sync"
 	"syscall"
 	"time"
-
-	"sql2json"
 )
 
 var (
@@ -170,10 +168,9 @@ func worker(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	timeout := 30 * time.Second
-	ctx, _ := context.WithTimeout(context.Background(), timeout)
-	err := sql2json.GetJson(ctx, MapMethod.Get(strCmd).(*MethdContent).DBConn, strSql, &bufdata)
+	err := SQL2Json(30, MapMethod.Get(strCmd).(*MethdContent).DBConn, strSql, &bufdata)
 	if nil != err {
+		fmt.Println(err.Error())
 		w.WriteHeader(500)
 		w.Write([]byte(http.StatusText(500)))
 		return
