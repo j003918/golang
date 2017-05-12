@@ -149,7 +149,6 @@ func worker(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	timeout := 30 * time.Second
 	strCmd := r.Form.Get("m")
 	strSql := ""
 	if MapMethod.Check(strCmd) {
@@ -164,16 +163,16 @@ func worker(w http.ResponseWriter, r *http.Request) {
 		strSql = strings.Replace(strSql, "#"+k+"#", r.Form.Get(k), -1)
 	}
 
-	var err error
 	var bufdata bytes.Buffer
-
 	if strings.ContainsAny(strSql, "#") {
 		w.WriteHeader(400)
 		w.Write([]byte(http.StatusText(400)))
 		return
 	}
+
+	timeout := 30 * time.Second
 	ctx, _ := context.WithTimeout(context.Background(), timeout)
-	err = sql2json.GetJson(ctx, MapMethod.Get(strCmd).(*MethdContent).DBConn, strSql, &bufdata)
+	err := sql2json.GetJson(ctx, MapMethod.Get(strCmd).(*MethdContent).DBConn, strSql, &bufdata)
 	if nil != err {
 		w.WriteHeader(500)
 		w.Write([]byte(http.StatusText(500)))

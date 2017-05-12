@@ -12,16 +12,6 @@ import (
 	//_ "github.com/mattn/go-sqlite3"
 )
 
-func chekError(err error, output bool) bool {
-	if err != nil {
-		if output {
-			fmt.Println(err.Error())
-		}
-		return true
-	}
-	return false
-}
-
 func OpenDb(timeout time.Duration, driver, dsn string, maxOpen, maxIdle int) (*sql.DB, error) {
 	ctx, _ := context.WithTimeout(context.Background(), timeout*time.Second)
 	mydb, err := _openDb(driver, dsn, maxOpen, maxIdle)
@@ -54,7 +44,7 @@ func _openDb(driver, dsn string, maxOpen, maxIdle int) (*sql.DB, error) {
 	return mydb, err
 }
 
-//for insert update delete use
+//for insert update delete
 func ModifyTab(timeout time.Duration, mydb *sql.DB, strsql string, args ...interface{}) (RowsAffected int64, ok bool) {
 	ctx, _ := context.WithTimeout(context.Background(), timeout*time.Second)
 	rowCount, ok := _modifyTab(mydb, strsql, args...)
