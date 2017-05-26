@@ -20,8 +20,8 @@ var (
 		(
 			id 			VARCHAR(64) PRIMARY KEY NOT NULL,     
     		pass		VARCHAR(128) NOT NULL, 
-			sign		VARCHAR(32) DEFAULT NULL, 
-    		trustzone 	VARCHAR(128) DEFAULT NULL, 
+			sign		VARCHAR(32) NOT NULL DEFAULT "", 
+    		trustzone 	VARCHAR(512) NOT NULL DEFAULT "*", 
     		status		INTEGER NOT NULL DEFAULT 0, 
     		login_time	DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP, 
     		create_time	DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP
@@ -32,16 +32,18 @@ var (
 		(
 			id		INTEGER PRIMARY KEY AUTO_INCREMENT,
     		driver	VARCHAR(64) NOT NULL, 
-    		dsn		VARCHAR(128) NOT NULL,
+    		dsn		VARCHAR(2048) NOT NULL,
 			status 	INTEGER NOT NULL DEFAULT 0,
-			info	VARCHAR(128)
+			info	VARCHAR(128) NOT NULL DEFAULT "",
+			update_time	DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP, 
+    		create_time	DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP
 		);`
 
 	SysTabCreate_sys_method = `		
 		CREATE TABLE IF NOT EXISTS sys_method 
 		(
 			method		VARCHAR(128) PRIMARY KEY NOT NULL, 
-    		content		VARCHAR(128) NOT NULL, 
+    		content		VARCHAR(1024) NOT NULL, 
     		dsn_id		INTEGER NOT NULL,
 			status 		INTEGER NOT NULL DEFAULT 0, 
     		update_time	DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP, 
@@ -55,7 +57,7 @@ type MethdContent struct {
 	DBConn  *sql.DB
 }
 
-type DB2HttpJS struct {
+type Query2JS struct {
 }
 
 func init() {
@@ -69,7 +71,7 @@ func init() {
 	MapMethod = safemap.NewSafeMap()
 	MapDbDriver.Set(-1, mydb)
 
-	//setupSysTab(mydb)
+	setupSysTab(mydb)
 
 	go reloadDriver(30)
 	go reloadMethod(15)
@@ -200,7 +202,7 @@ func setupSysTab(mydb *sql.DB) {
 
 	//add test method
 	ModifyTab(15, mydb, `insert into sys_method(method,content,dsn_id) values(?,?,?)`, "lis", `select * from mlink.lis01`, 1)
-	ModifyTab(15, mydb, `insert into sys_method(method,content,dsn_id) values(?,?,?)`, "hisalluser", `select * from staff_dict`, 2)
+	ModifyTab(15, mydb, `insert into sys_method(method,content,dsn_id) values(?,?,?)`, "hisalluser", `select emp_no,user_name,name,dept_code,job,title,CREATE_DATE from staff_dict`, 2)
 	ModifyTab(15, mydb, `insert into sys_method(method,content,dsn_id) values(?,?,?)`, "hisuser", `select * from staff_dict where user_name='#un#'`, 2)
 }
 

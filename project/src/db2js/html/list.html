@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<!--
+<link rel="stylesheet" href="https://apps.bdimg.com/libs/jquerymobile/1.4.5/jquery.mobile-1.4.5.min.css">
+<script src="https://apps.bdimg.com/libs/jquery/1.10.2/jquery.min.js"></script>
+<script src="https://apps.bdimg.com/libs/jquerymobile/1.4.5/jquery.mobile-1.4.5.min.js"></script>
+-->
+<link rel="stylesheet" href="jquerymobile/1.4.5/jquery.mobile-1.4.5.min.css">
+<script src="jquery/1.10.2/jquery.min.js"></script>
+<script src="jquerymobile/1.4.5/jquery.mobile-1.4.5.min.js"></script>
+<script type="text/javascript">  
+        $(function () {  
+            //方式一 Ajax方式获取Json数据  
+            $.ajax({  
+                url: 'get?m=hisalluser&user=jhf',  
+                type: 'GET',  
+                dataType: 'json',  
+                timeout: 1000,  
+                cache: false,  
+                beforeSend: LoadFunction, //加载执行方法    
+                error: erryFunction,  //错误执行方法    
+                success: succFunction //成功执行方法    
+            })  
+            function LoadFunction() {  
+                $("#list").html('加载中...');  
+            }  
+            function erryFunction() {  
+                $("#list").html('加载失败,请重试'); 
+            }  
+            function succFunction(data) {   
+			$("#list").html('头部文本');                
+                var tt = "";  
+				var td = "<tr>";  
+                    $.each(data, function (k, v) { 
+                        $.each(v, function (kk, vv) {  
+                            //tt += kk + ":" + vv + "___"; 
+							//tt += vv + "	"; 
+							td += "<td>"+vv+"</td>"
+                        });  
+                        //tt += "<br/>";  
+						td += "</tr>";
+                    });  
+                 
+                    //$("#list").html(tt);
+					$("#myTable").append(td);
+            }  
+        }); 
+    </script>  
+</head>  
+<body>  
+<div data-role="page" id="pageone">
+<div data-role="header">
+    <h1 id="list">回流表格</h1>
+  </div>
+
+<div data-role="main" class="ui-content">
+<table data-role="table" class="ui-responsive ui-shadow" id="myTable" >
+    <thead>
+        <tr>
+            <th>工号</th>
+            <th>用户名</th>
+			<th>姓名</th>
+            <th>部门编码</th>
+			<th>岗位</th>
+            <th>标题</th>
+			<th >创建时间</th>
+        </tr>
+    </thead>
+    <tbody>
+    </tbody>
+</table>
+</div>
+<div data-role="footer">
+    <h1>底部文本</h1>
+  </div>
+</div>
+</body>  
+</html>  
