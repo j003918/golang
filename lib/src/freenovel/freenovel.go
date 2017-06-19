@@ -15,17 +15,20 @@ import (
 
 type novel struct {
 	wetsite        string
+	referer        string
 	searchUrl      string
 	charset        string
 	novelName      string
 	novelMenu      string
+	volumeName     string
 	chapterTitle   string
 	chapterContent string
 	chapterPreUrl  string
 }
 
 type bookInfo struct {
-	name        string
+	name string
+	//VolumeName  string
 	chtNameList []string
 	chtUrlList  []string
 }
@@ -67,46 +70,109 @@ func init() {
 		chapterPreUrl:  "",
 	}
 
+	mapNovels["www.88dushu.com"] = &novel{
+		wetsite:   "www.88dushu.com",
+		searchUrl: "http://zn.88dushu.com/cse/search?s=2308740887988514756&entry=1&ie=gbk&q=",
+		charset:   "gbk",
+		//
+		novelName:      "div.rt h1",
+		novelMenu:      "div.mulu ul li a",
+		chapterTitle:   "div.novel h1",
+		chapterContent: "div.yd_text2",
+		chapterPreUrl:  "",
+	}
+
+	mapNovels["www.qu.la"] = &novel{
+		wetsite:        "www.qu.la",
+		searchUrl:      "http://zhannei.baidu.com/cse/search?s=920895234054625192&entry=1&q=",
+		charset:        "utf-8",
+		novelName:      "#info h1",
+		novelMenu:      "#list dl dd a",
+		chapterTitle:   "div.bookname h1",
+		chapterContent: "#content",
+		chapterPreUrl:  "http://www.qu.la",
+	}
+
+	mapNovels["www.biqudao.com"] = &novel{
+		wetsite:        "www.biqudao.com",
+		searchUrl:      "http://zhannei.baidu.com/cse/search?s=3654077655350271938&entry=1&q=",
+		charset:        "utf-8",
+		novelName:      "#info h1",
+		novelMenu:      "#list dl dd a",
+		chapterTitle:   "div.bookname h1",
+		chapterContent: "#content",
+		chapterPreUrl:  "http://www.biqudao.com",
+	}
+
 }
 
-func getPageHtml(strUrl, charset string, hc *http.Client) string {
-	rsp, err := hc.Get(strUrl)
-	if err != nil {
-		fmt.Println(err)
-		return ""
+func getPageHtml(strUrl, charset string, hc *http.Client, tryCount int) string {
+	//fmt.Println("getPageHtml start", strUrl)
+	strBody := ""
+	nTry := 0
+	if tryCount < 1 {
+		tryCount = 1
 	}
-	defer rsp.Body.Close()
+RETRYGET:
+	func() {
+		rsp, err := hc.Get(strUrl)
+		if err != nil {
+			fmt.Println(err)
+			return
+		}
+		defer rsp.Body.Close()
 
-	p, err := ioutil.ReadAll(rsp.Body)
-	if err != nil {
-		fmt.Println(err)
-		return ""
+		if rsp.StatusCode >= 300 {
+			fmt.Println("HTTP StatusCode:", rsp.StatusCode)
+		}
+
+		p, err := ioutil.ReadAll(rsp.Body)
+		if err != nil {
+			fmt.Println(err)
+			return
+		}
+
+		strBody = string(p)
+		switch charset {
+		case "gbk":
+			strBody = mahonia.NewDecoder("gbk").ConvertString(strBody)
+		default:
+		}
+	}()
+
+	if nTry < tryCount {
+		nTry += 1
+		goto RETRYGET
 	}
-
-	strBody := string(p)
-	switch charset {
-	case "gbk":
-		strBody = mahonia.NewDecoder("gbk").ConvertString(strBody)
-	default:
-	}
-
+	//fmt.Println("getPageHtml end", strUrl, strBody)
 	return strBody
 }
 
 func getBookInfo(bi *bookInfo, nl *novel, noveUrl string) bool {
-	strHtml := getPageHtml(noveUrl, nl.charset, &http.Client{})
+	strHtml := getPageHtml(noveUrl, nl.charset, &http.Client{}, 3)
 	if strHtml == "" {
 		return false
 	}
 	dom, err := goquery.ParseString(strHtml)
 	if err != nil {
+		fmt.Println(err)
 		return false
 	}
 
 	bi.name = dom.Find(nl.novelName).Text()
 	nodes := dom.Find(nl.novelMenu)
+	//strVolName := ""
+
 	for i := 0; i < nodes.Length(); i++ {
 		v := nodes.Eq(i)
+		/*
+			if nl.volumeName != "" {
+				strVolName = v.Find(nl.volumeName).Text()
+				fmt.Println("dddsqwerqw", strVolName)
+			}
+			chp := v.Find(nl.chapterTitle)
+			fmt.Println("chp", nl.chapterTitle, chp.Text())
+		*/
 		if v.Text() != "" {
 			if nl.chapterPreUrl != "" {
 				bi.chtUrlList = append(bi.chtUrlList, nl.chapterPreUrl+v.Attr("href"))
@@ -140,6 +206,8 @@ func NovelDownload(noveUrl string) bool {
 	}
 
 	hc := &http.Client{}
+	//http.Request.Header.Add(R)
+	//http.NewRequest().Header
 	f, err := os.Create(bi.name + ".txt")
 	if err != nil {
 		fmt.Println(err)
@@ -149,7 +217,7 @@ func NovelDownload(noveUrl string) bool {
 
 	for i := 0; i < len(bi.chtUrlList); i++ {
 		func(strTitle, strUrl string) {
-			str := getPageHtml(strUrl, nitem.charset, hc)
+			str := getPageHtml(strUrl, nitem.charset, hc, 3)
 			dom, err := goquery.ParseString(str)
 			if err != nil {
 				fmt.Println(err)
