@@ -2,6 +2,7 @@
 package freenovel
 
 import (
+	"bytes"
 	"fmt"
 	"io/ioutil"
 	"net/http"
@@ -9,106 +10,213 @@ import (
 	"os"
 	"strings"
 
+	"github.com/PuerkitoBio/goquery"
 	"github.com/axgle/mahonia"
-	"github.com/crufter/goquery"
 )
 
-type novel struct {
-	wetsite        string
-	referer        string
-	searchUrl      string
-	charset        string
-	novelName      string
-	novelMenu      string
-	volumeName     string
-	chapterTitle   string
-	chapterContent string
-	chapterPreUrl  string
+type websiteInfo struct {
+	wetsite     string
+	charset     string
+	searchUrl   string
+	searchTag   string
+	seaTitleTag string
+	seaUrlTag   string
+}
+
+type novelMenuTag struct {
+	refererUrl string
+	name       string
+	list       string
+	isVol      bool
+	volume     string
+	item       string
+	preUrl     string
+	itemLink   string
+}
+
+type novelChapterTag struct {
+	refererUrl  string
+	title       string
+	content     string
+	nextChapter string
+	strip       string
+}
+
+type Noveler struct {
+	wsi websiteInfo
+	nmt novelMenuTag
+	nct novelChapterTag
 }
 
 type bookInfo struct {
-	name string
-	//VolumeName  string
+	name        string
 	chtNameList []string
 	chtUrlList  []string
 }
 
-var mapNovels map[string]*novel = make(map[string]*novel)
+var mapNoveler map[string]*Noveler = make(map[string]*Noveler)
 var chtReplacer = strings.NewReplacer("<br>", "\r\n", "<br/>", "\r\n", "<br />", "\r\n")
 
 func init() {
-	mapNovels["www.xxbiquge.com"] = &novel{
-		wetsite:        "www.xxbiquge.com",
-		searchUrl:      "http://zhannei.baidu.com/cse/search?s=8823758711381329060&ie=utf-8&q=",
-		charset:        "utf-8",
-		novelName:      "#info h1",
-		novelMenu:      "#list dl dd a",
-		chapterTitle:   "div.bookname h1",
-		chapterContent: "#content",
-		chapterPreUrl:  "http://www.xxbiquge.com",
+	mapNoveler["www.xxbiquge.com"] = &Noveler{
+		websiteInfo{
+			wetsite:     "www.xxbiquge.com",
+			charset:     "utf-8",
+			searchUrl:   "http://zhannei.baidu.com/cse/search?s=8823758711381329060&q=",
+			searchTag:   "div.result-game-item-detail h3 a",
+			seaTitleTag: "title",
+			seaUrlTag:   "href",
+		},
+		novelMenuTag{
+			refererUrl: "",
+			name:       "#info h1",
+			list:       "#list dl",
+			isVol:      false,
+			volume:     "",
+			item:       "dd a",
+			preUrl:     "http://www.xxbiquge.com",
+			itemLink:   "href",
+		},
+		novelChapterTag{
+			refererUrl:  "",
+			title:       "div.bookname h1",
+			content:     "#content",
+			nextChapter: "",
+			strip:       "",
+		},
 	}
 
-	mapNovels["www.zwdu.com"] = &novel{
-		wetsite:        "www.zwdu.com",
-		searchUrl:      "http://zhannei.baidu.com/cse/search?s=9974397986872341910&ie=gbk&q=",
-		charset:        "gbk",
-		novelName:      "#info h1",
-		novelMenu:      "#list dl dd a",
-		chapterTitle:   "div.bookname h1",
-		chapterContent: "#content",
-		chapterPreUrl:  "http://www.zwdu.com",
+	mapNoveler["www.zwdu.com"] = &Noveler{
+		websiteInfo{
+			wetsite:     "www.zwdu.com",
+			charset:     "gbk",
+			searchUrl:   "http://zhannei.baidu.com/cse/search?s=9974397986872341910&q=",
+			searchTag:   "div.result-game-item-detail h3 a",
+			seaTitleTag: "title",
+			seaUrlTag:   "href",
+		},
+		novelMenuTag{
+			refererUrl: "",
+			name:       "#info h1",
+			list:       "#list dl",
+			isVol:      false,
+			volume:     "",
+			item:       "dd a",
+			preUrl:     "http://www.zwdu.com",
+			itemLink:   "href",
+		},
+		novelChapterTag{
+			refererUrl:  "",
+			title:       "div.bookname h1",
+			content:     "#content",
+			nextChapter: "",
+			strip:       "",
+		},
 	}
 
-	mapNovels["www.23us.com"] = &novel{
-		wetsite:        "www.23us.com",
-		searchUrl:      "http://zhannei.baidu.com/cse/search?s=9974397986872341910&ie=gbk&q",
-		charset:        "gbk",
-		novelName:      "div.bdsub dl dd h1",
-		novelMenu:      "#at tbody tr td a",
-		chapterTitle:   "div.bdsub dl dd",
-		chapterContent: "#contents",
-		chapterPreUrl:  "",
+	mapNoveler["www.23us.com"] = &Noveler{
+		websiteInfo{
+			wetsite:   "www.23us.com",
+			charset:   "gbk",
+			searchUrl: "",
+		},
+		novelMenuTag{
+			refererUrl: "",
+			name:       "div.bdsub dl dd h1",
+			list:       "#at tbody tr ",
+			isVol:      false,
+			volume:     "",
+			item:       "td a",
+			preUrl:     "",
+			itemLink:   "href",
+		},
+		novelChapterTag{
+			refererUrl:  "",
+			title:       "div.bdsub dl dd",
+			content:     "#contents",
+			nextChapter: "",
+			strip:       "顶点小说 ２３ＵＳ．ＣＯＭ更新最快",
+		},
 	}
 
-	mapNovels["www.88dushu.com"] = &novel{
-		wetsite:   "www.88dushu.com",
-		searchUrl: "http://zn.88dushu.com/cse/search?s=2308740887988514756&entry=1&ie=gbk&q=",
-		charset:   "gbk",
-		//
-		novelName:      "div.rt h1",
-		novelMenu:      "div.mulu ul li a",
-		chapterTitle:   "div.novel h1",
-		chapterContent: "div.yd_text2",
-		chapterPreUrl:  "",
+	mapNoveler["www.88dushu.com"] = &Noveler{
+		websiteInfo{
+			wetsite:   "www.88dushu.com",
+			charset:   "gbk",
+			searchUrl: "",
+		},
+		novelMenuTag{
+			refererUrl: "",
+			name:       "div.rt h1",
+			list:       "div.mulu ul",
+			isVol:      false,
+			volume:     "",
+			item:       "li a",
+			preUrl:     "",
+			itemLink:   "href",
+		},
+		novelChapterTag{
+			refererUrl:  "",
+			title:       "div.novel h1",
+			content:     "div.yd_text2",
+			nextChapter: "",
+			strip:       "",
+		},
 	}
 
-	mapNovels["www.qu.la"] = &novel{
-		wetsite:        "www.qu.la",
-		searchUrl:      "http://zhannei.baidu.com/cse/search?s=920895234054625192&entry=1&q=",
-		charset:        "utf-8",
-		novelName:      "#info h1",
-		novelMenu:      "#list dl dd a",
-		chapterTitle:   "div.bookname h1",
-		chapterContent: "#content",
-		chapterPreUrl:  "http://www.qu.la",
+	mapNoveler["www.qu.la"] = &Noveler{
+		websiteInfo{
+			wetsite:   "www.qu.la",
+			charset:   "utf-8",
+			searchUrl: "",
+		},
+		novelMenuTag{
+			refererUrl: "",
+			name:       "#info h1",
+			list:       "#list dl",
+			isVol:      false,
+			volume:     "",
+			item:       "dd a",
+			preUrl:     "http://www.qu.la",
+			itemLink:   "href",
+		},
+		novelChapterTag{
+			refererUrl:  "",
+			title:       "div.bookname h1",
+			content:     "#content",
+			nextChapter: "",
+			strip:       "<script>chaptererror();</script>",
+		},
 	}
 
-	mapNovels["www.biqudao.com"] = &novel{
-		wetsite:        "www.biqudao.com",
-		searchUrl:      "http://zhannei.baidu.com/cse/search?s=3654077655350271938&entry=1&q=",
-		charset:        "utf-8",
-		novelName:      "#info h1",
-		novelMenu:      "#list dl dd a",
-		chapterTitle:   "div.bookname h1",
-		chapterContent: "#content",
-		chapterPreUrl:  "http://www.biqudao.com",
+	mapNoveler["www.biqudao.com"] = &Noveler{
+		websiteInfo{
+			wetsite:   "www.biqudao.com",
+			charset:   "utf-8",
+			searchUrl: "",
+		},
+		novelMenuTag{
+			refererUrl: "",
+			name:       "#info h1",
+			list:       "#list dl",
+			isVol:      false,
+			volume:     "",
+			item:       "dd a",
+			preUrl:     "http://www.biqudao.com",
+			itemLink:   "href",
+		},
+		novelChapterTag{
+			refererUrl:  "",
+			title:       "div.bookname h1",
+			content:     "#content",
+			nextChapter: "",
+			strip:       "",
+		},
 	}
-
 }
 
-func getPageHtml(strUrl, charset string, hc *http.Client, tryCount int) string {
-	//fmt.Println("getPageHtml start", strUrl)
-	strBody := ""
+func viewSource(strUrl, charset string, outBuf *bytes.Buffer, hc *http.Client, tryCount int) {
+	outBuf.Reset()
 	nTry := 0
 	if tryCount < 1 {
 		tryCount = 1
@@ -122,64 +230,57 @@ RETRYGET:
 		}
 		defer rsp.Body.Close()
 
-		if rsp.StatusCode >= 300 {
-			fmt.Println("HTTP StatusCode:", rsp.StatusCode)
-		}
-
 		p, err := ioutil.ReadAll(rsp.Body)
 		if err != nil {
 			fmt.Println(err)
 			return
 		}
 
-		strBody = string(p)
 		switch charset {
 		case "gbk":
-			strBody = mahonia.NewDecoder("gbk").ConvertString(strBody)
+			outBuf.WriteString(mahonia.NewDecoder("gbk").ConvertByte(p))
+		case "gb18030":
+			outBuf.WriteString(mahonia.NewDecoder("gb18030").ConvertByte(p))
+		case "utf-16":
+			outBuf.WriteString(mahonia.NewDecoder("utf-16").ConvertByte(p))
 		default:
+			outBuf.Write(p)
 		}
 	}()
 
-	if nTry < tryCount {
+	if outBuf.Len() == 0 && nTry < tryCount {
 		nTry += 1
 		goto RETRYGET
 	}
-	//fmt.Println("getPageHtml end", strUrl, strBody)
-	return strBody
 }
 
-func getBookInfo(bi *bookInfo, nl *novel, noveUrl string) bool {
-	strHtml := getPageHtml(noveUrl, nl.charset, &http.Client{}, 3)
-	if strHtml == "" {
-		return false
-	}
-	dom, err := goquery.ParseString(strHtml)
+func getBookInfo(bi *bookInfo, nl *Noveler, noveUrl string) bool {
+	hc := &http.Client{}
+	buf := &bytes.Buffer{}
+	viewSource(noveUrl, nl.wsi.charset, buf, hc, 3)
+
+	doc, err := goquery.NewDocumentFromReader(buf)
 	if err != nil {
 		fmt.Println(err)
 		return false
 	}
 
-	bi.name = dom.Find(nl.novelName).Text()
-	nodes := dom.Find(nl.novelMenu)
-	//strVolName := ""
+	bi.name = doc.Find(nl.nmt.name).Text()
+	nodes := doc.Find(nl.nmt.list).Find(nl.nmt.item)
+
+	if nl.nmt.preUrl == "" {
+		nl.nmt.preUrl = noveUrl
+	}
+
+	strItemLink := nl.nmt.itemLink
 
 	for i := 0; i < nodes.Length(); i++ {
 		v := nodes.Eq(i)
-		/*
-			if nl.volumeName != "" {
-				strVolName = v.Find(nl.volumeName).Text()
-				fmt.Println("dddsqwerqw", strVolName)
-			}
-			chp := v.Find(nl.chapterTitle)
-			fmt.Println("chp", nl.chapterTitle, chp.Text())
-		*/
-		if v.Text() != "" {
-			if nl.chapterPreUrl != "" {
-				bi.chtUrlList = append(bi.chtUrlList, nl.chapterPreUrl+v.Attr("href"))
-			} else {
-				bi.chtUrlList = append(bi.chtUrlList, noveUrl+v.Attr("href"))
-			}
-			bi.chtNameList = append(bi.chtNameList, v.Text())
+		strTitle := v.Text()
+		strUrl, _ := v.Attr(strItemLink)
+		if strTitle != "" {
+			bi.chtUrlList = append(bi.chtUrlList, nl.nmt.preUrl+strUrl)
+			bi.chtNameList = append(bi.chtNameList, strTitle)
 		}
 	}
 
@@ -193,21 +294,22 @@ func NovelDownload(noveUrl string) bool {
 		return false
 	}
 
-	nitem, ok := mapNovels[u.Host]
+	nitem, ok := mapNoveler[u.Host]
 	if !ok {
 		fmt.Println("not supported website:", noveUrl)
 		return false
 	}
 
 	bi := bookInfo{}
+
 	if !getBookInfo(&bi, nitem, noveUrl) {
 		fmt.Println("parse website tag err")
 		return false
 	}
 
 	hc := &http.Client{}
-	//http.Request.Header.Add(R)
-	//http.NewRequest().Header
+	buf := &bytes.Buffer{}
+
 	f, err := os.Create(bi.name + ".txt")
 	if err != nil {
 		fmt.Println(err)
@@ -217,14 +319,18 @@ func NovelDownload(noveUrl string) bool {
 
 	for i := 0; i < len(bi.chtUrlList); i++ {
 		func(strTitle, strUrl string) {
-			str := getPageHtml(strUrl, nitem.charset, hc, 3)
-			dom, err := goquery.ParseString(str)
+			viewSource(strUrl, nitem.wsi.charset, buf, hc, 3)
+			doc, err := goquery.NewDocumentFromReader(buf)
 			if err != nil {
 				fmt.Println(err)
 				return
 			}
 
-			strContent := chtReplacer.Replace(dom.Find(nitem.chapterContent).Html())
+			strContentHtml, _ := doc.Find(nitem.nct.content).Html()
+			strContent := chtReplacer.Replace(strContentHtml)
+			if nitem.nct.strip != "" {
+				strContent = strings.Replace(strContent, nitem.nct.strip, "", -1)
+			}
 
 			if strContent == "" {
 				fmt.Println("get charpter error:", strTitle, strUrl)
@@ -234,8 +340,39 @@ func NovelDownload(noveUrl string) bool {
 			f.WriteString(strContent)
 			f.WriteString("\r\n")
 			fmt.Println(strTitle, strUrl)
+			//fmt.Printf("%8q", i)
 			f.Sync()
 		}(bi.chtNameList[i], bi.chtUrlList[i])
 	}
+
 	return true
+}
+
+//-----search------
+
+func printSearchRst(nl *Noveler, strKey string) {
+	searchUrl := nl.wsi.searchUrl + strKey
+	doc, err := goquery.NewDocument(searchUrl)
+	if err != nil {
+		fmt.Println(err)
+		return
+	}
+
+	sea := doc.Find(nl.wsi.searchTag)
+	for i := 0; i < sea.Length(); i++ {
+		strTitle, ok := sea.Eq(i).Attr(nl.wsi.seaTitleTag)
+		if !ok || strTitle != strKey {
+			continue
+		}
+		strHref, _ := sea.Eq(i).Attr(nl.wsi.seaUrlTag)
+		fmt.Println(strTitle, strHref)
+	}
+}
+
+func NovelSearch(name string) {
+	for _, v := range mapNoveler {
+		if v.wsi.searchUrl != "" {
+			printSearchRst(v, name)
+		}
+	}
 }
