@@ -350,8 +350,8 @@ func NovelDownload(noveUrl string) bool {
 
 //-----search------
 
-func printSearchRst(nl *Noveler, strKey string) {
-	searchUrl := nl.wsi.searchUrl + strKey
+func printSearchRst(nl *Noveler, strKeyWord string) {
+	searchUrl := nl.wsi.searchUrl + strKeyWord
 	doc, err := goquery.NewDocument(searchUrl)
 	if err != nil {
 		fmt.Println(err)
@@ -361,7 +361,7 @@ func printSearchRst(nl *Noveler, strKey string) {
 	sea := doc.Find(nl.wsi.searchTag)
 	for i := 0; i < sea.Length(); i++ {
 		strTitle, ok := sea.Eq(i).Attr(nl.wsi.seaTitleTag)
-		if !ok || strTitle != strKey {
+		if !ok || strTitle != strKeyWord {
 			continue
 		}
 		strHref, _ := sea.Eq(i).Attr(nl.wsi.seaUrlTag)
@@ -369,10 +369,10 @@ func printSearchRst(nl *Noveler, strKey string) {
 	}
 }
 
-func NovelSearch(name string) {
+func NovelSearch(strKeyWord string) {
 	for _, v := range mapNoveler {
 		if v.wsi.searchUrl != "" {
-			printSearchRst(v, name)
+			printSearchRst(v, strKeyWord)
 		}
 	}
 }
