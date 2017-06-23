@@ -195,15 +195,13 @@ func setupSysTab(mydb *sql.DB) {
 	SCUAdd("tf", "tf")
 
 	//add test dsn
-	SCDAdd("mysql", `jhf:jhf@tcp(130.1.11.60:3306)/test?charset=utf8`, "sysconfig")
 	SCDAdd("oci8", `system/manager@his`, "his")
 	SCDAdd("mysql", `root:root@tcp(172.25.125.101:3306)/oa0618?charset=utf8`, "oa")
 	SCDAdd("mysql", `root:root@tcp(130.1.10.230:3306)/zyyoutdoor?charset=utf8`, "zyyoutdoor")
 
 	//add test method
-	ModifyTab(15, mydb, `insert into sys_method(method,content,dsn_id) values(?,?,?)`, "lis", `select * from mlink.lis01`, 1)
-	ModifyTab(15, mydb, `insert into sys_method(method,content,dsn_id) values(?,?,?)`, "hisalluser", `select emp_no,user_name,name,dept_code,job,title,CREATE_DATE from staff_dict`, 2)
-	ModifyTab(15, mydb, `insert into sys_method(method,content,dsn_id) values(?,?,?)`, "hisuser", `select * from staff_dict where user_name='#un#'`, 2)
+	ModifyTab(15, mydb, `insert into sys_method(method,content,dsn_id) values(?,?,?)`, "inpi", `select DEPT_CODE,DEPT_NAME,CHARGES from COMM.V_JHF_INCOME_OUTP order by DEPT_NAME`, 1)
+	ModifyTab(15, mydb, `insert into sys_method(method,content,dsn_id) values(?,?,?)`, "outpi", `select DEPT_CODE,DEPT_NAME,CHARGES from COMM.V_JHF_INCOME_INP order by DEPT_NAME`, 1)
 }
 
 func str2md5(str string) string {

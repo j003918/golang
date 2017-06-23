@@ -116,9 +116,12 @@ func init() {
 
 	mapNoveler["www.23us.com"] = &Noveler{
 		websiteInfo{
-			wetsite:   "www.23us.com",
-			charset:   "gbk",
-			searchUrl: "",
+			wetsite:     "www.23us.com",
+			charset:     "gbk",
+			searchUrl:   "http://zhannei.baidu.com/cse/search?s=8253726671271885340&q=",
+			searchTag:   "div.result-game-item-detail h3 a",
+			seaTitleTag: "title",
+			seaUrlTag:   "href",
 		},
 		novelMenuTag{
 			refererUrl: "",
@@ -141,9 +144,12 @@ func init() {
 
 	mapNoveler["www.88dushu.com"] = &Noveler{
 		websiteInfo{
-			wetsite:   "www.88dushu.com",
-			charset:   "gbk",
-			searchUrl: "",
+			wetsite:     "www.88dushu.com",
+			charset:     "gbk",
+			searchUrl:   "http://zn.88dushu.com/cse/search?s=2308740887988514756&q=",
+			searchTag:   "div.result-game-item-detail h3 a",
+			seaTitleTag: "title",
+			seaUrlTag:   "href",
 		},
 		novelMenuTag{
 			refererUrl: "",
@@ -166,9 +172,12 @@ func init() {
 
 	mapNoveler["www.qu.la"] = &Noveler{
 		websiteInfo{
-			wetsite:   "www.qu.la",
-			charset:   "utf-8",
-			searchUrl: "",
+			wetsite:     "www.qu.la",
+			charset:     "utf-8",
+			searchUrl:   "http://zhannei.baidu.com/cse/search?s=920895234054625192&q=",
+			searchTag:   "div.result-game-item-detail h3 a",
+			seaTitleTag: "title",
+			seaUrlTag:   "href",
 		},
 		novelMenuTag{
 			refererUrl: "",
@@ -191,9 +200,12 @@ func init() {
 
 	mapNoveler["www.biqudao.com"] = &Noveler{
 		websiteInfo{
-			wetsite:   "www.biqudao.com",
-			charset:   "utf-8",
-			searchUrl: "",
+			wetsite:     "www.biqudao.com",
+			charset:     "utf-8",
+			searchUrl:   "http://zhannei.baidu.com/cse/search?s=3654077655350271938&entry=1&q=",
+			searchTag:   "div.result-game-item-detail h3 a",
+			seaTitleTag: "title",
+			seaUrlTag:   "href",
 		},
 		novelMenuTag{
 			refererUrl: "",
@@ -213,6 +225,7 @@ func init() {
 			strip:       "",
 		},
 	}
+
 }
 
 func viewSource(strUrl, charset string, outBuf *bytes.Buffer, hc *http.Client, tryCount int) {
@@ -372,6 +385,7 @@ func printSearchRst(nl *Noveler, strKeyWord string) {
 func NovelSearch(strKeyWord string) {
 	for _, v := range mapNoveler {
 		if v.wsi.searchUrl != "" {
+			//fmt.Println("Host:", v.wsi.wetsite)
 			printSearchRst(v, strKeyWord)
 		}
 	}
