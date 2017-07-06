@@ -206,6 +206,12 @@ func getBookInfo(bi *bookInfo, nl *novel, noveUrl string) bool {
 	return true
 }
 
+func WebsiteList() {
+	for k, _ := range mapNovel {
+		fmt.Println(k)
+	}
+}
+
 func NovelDownload(noveUrl string) bool {
 	u, err := url.Parse(noveUrl)
 	if err != nil {
