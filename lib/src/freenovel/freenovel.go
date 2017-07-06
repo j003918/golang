@@ -110,7 +110,7 @@ func init() {
 
 	mapNovel["www.shoujikanshu.org"] = &Novel{
 		wetsite:         "www.shoujikanshu.org",
-		charset:         "gbk",
+		charset:         "gb2312",
 		menuRefer:       "",
 		noveName:        "div.box-artic h1",
 		menuList:        "div.list li a",
@@ -144,6 +144,8 @@ RETRYGET:
 		}
 
 		switch charset {
+		case "gb2312":
+			outBuf.WriteString(mahonia.NewDecoder("gbk").ConvertByte(p))
 		case "gbk":
 			outBuf.WriteString(mahonia.NewDecoder("gbk").ConvertByte(p))
 		case "gb18030":
