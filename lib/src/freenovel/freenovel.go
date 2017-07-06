@@ -12,13 +12,14 @@ import (
 
 	"github.com/PuerkitoBio/goquery"
 	"github.com/axgle/mahonia"
+	"github.com/go-yaml/yaml"
 )
 
 type novel struct {
 	wetsite         string
 	charset         string
 	menuRefer       string
-	noveName        string
+	novelName       string
 	menuList        string
 	chtRefer        string
 	chtTitle        string
@@ -32,94 +33,19 @@ type bookInfo struct {
 	chtUrlList  []string
 }
 
-var mapNovel map[string]*novel = make(map[string]*novel)
 var chtReplacer = strings.NewReplacer("<br>", "\r\n", "<br/>", "\r\n", "<br />", "\r\n")
+var mapYaml map[interface{}]interface{} = make(map[interface{}]interface{})
 
 func init() {
-	mapNovel["www.xxbiquge.com"] = &novel{
-		wetsite:         "www.xxbiquge.com",
-		charset:         "utf-8",
-		menuRefer:       "",
-		noveName:        "#info h1",
-		menuList:        "#list dl dd a",
-		chtRefer:        "",
-		chtTitle:        "div.bookname h1",
-		chtContent:      "#content",
-		chtContentStrip: "",
+	data, err := ioutil.ReadFile("config.yaml")
+	if err != nil {
+		fmt.Println(err)
 	}
 
-	mapNovel["www.zwdu.com"] = &novel{
-		wetsite:         "www.zwdu.com",
-		charset:         "gbk",
-		menuRefer:       "",
-		noveName:        "#info h1",
-		menuList:        "#list dl dd a",
-		chtRefer:        "",
-		chtTitle:        "div.bookname h1",
-		chtContent:      "#content",
-		chtContentStrip: "",
+	err = yaml.Unmarshal(data, &mapYaml)
+	if err != nil {
+		fmt.Printf("error: %v", err)
 	}
-
-	mapNovel["www.23us.com"] = &novel{
-		wetsite:         "www.23us.com",
-		charset:         "gbk",
-		menuRefer:       "",
-		noveName:        "div.bdsub dl dd h1",
-		menuList:        "#at tbody tr td a",
-		chtRefer:        "",
-		chtTitle:        "div.bdsub dl dd",
-		chtContent:      "#contents",
-		chtContentStrip: "顶点小说 ２３ＵＳ．ＣＯＭ更新最快",
-	}
-
-	mapNovel["www.88dushu.com"] = &novel{
-		wetsite:         "www.88dushu.com",
-		charset:         "gbk",
-		menuRefer:       "",
-		noveName:        "div.rt h1",
-		menuList:        "div.mulu ul li a",
-		chtRefer:        "",
-		chtTitle:        "div.novel h1",
-		chtContent:      "div.yd_text2",
-		chtContentStrip: "",
-	}
-
-	mapNovel["www.qu.la"] = &novel{
-		wetsite:         "www.qu.la",
-		charset:         "utf-8",
-		menuRefer:       "",
-		noveName:        "#info h1",
-		menuList:        "#list dl dd a",
-		chtRefer:        "",
-		chtTitle:        "div.bookname h1",
-		chtContent:      "#content",
-		chtContentStrip: "<script>chaptererror();</script>",
-	}
-
-	mapNovel["www.biqudao.com"] = &novel{
-		wetsite:         "www.biqudao.com",
-		charset:         "utf-8",
-		menuRefer:       "",
-		noveName:        "#info h1",
-		menuList:        "#list dl dd a",
-		chtRefer:        "",
-		chtTitle:        "div.bookname h1",
-		chtContent:      "#content",
-		chtContentStrip: "",
-	}
-
-	mapNovel["www.shoujikanshu.org"] = &novel{
-		wetsite:         "www.shoujikanshu.org",
-		charset:         "gb2312",
-		menuRefer:       "",
-		noveName:        "div.box-artic h1",
-		menuList:        "div.list li a",
-		chtRefer:        "",
-		chtTitle:        "div.subNav h1",
-		chtContent:      "div.content",
-		chtContentStrip: "",
-	}
-
 }
 
 func viewSource(strUrl, charset string, outBuf *bytes.Buffer, hc *http.Client, tryCount int) {
@@ -174,7 +100,7 @@ func getBookInfo(bi *bookInfo, nl *novel, noveUrl string) bool {
 		return false
 	}
 
-	bi.name = doc.Find(nl.noveName).Text()
+	bi.name = doc.Find(nl.novelName).Text()
 	nodes := doc.Find(nl.menuList)
 
 	itemCount := nodes.Length()
@@ -207,7 +133,7 @@ func getBookInfo(bi *bookInfo, nl *novel, noveUrl string) bool {
 }
 
 func WebsiteList() {
-	for k, _ := range mapNovel {
+	for k, _ := range mapYaml {
 		fmt.Println(k)
 	}
 }
@@ -219,11 +145,22 @@ func NovelDownload(noveUrl string) bool {
 		return false
 	}
 
-	nitem, ok := mapNovel[u.Host]
+	v, ok := mapYaml[u.Host].(map[interface{}]interface{})
 	if !ok {
 		fmt.Println("not supported website:", noveUrl)
 		return false
 	}
+
+	nitem := &novel{}
+	nitem.wetsite = v["wetsite"].(string)
+	nitem.charset = v["charset"].(string)
+	nitem.menuRefer = v["menuRefer"].(string)
+	nitem.novelName = v["novelName"].(string)
+	nitem.menuList = v["menuList"].(string)
+	nitem.chtRefer = v["chtRefer"].(string)
+	nitem.chtTitle = v["chtTitle"].(string)
+	nitem.chtContent = v["chtContent"].(string)
+	nitem.chtContentStrip = v["chtContentStrip"].(string)
 
 	bi := bookInfo{}
 
