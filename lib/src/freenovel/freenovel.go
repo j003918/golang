@@ -16,6 +16,7 @@ import (
 )
 
 type novel struct {
+	proxy           string
 	wetsite         string
 	charset         string
 	menuRefer       string
@@ -89,8 +90,15 @@ RETRYGET:
 	}
 }
 
-func getBookInfo(bi *bookInfo, nl *novel, noveUrl string) bool {
-	hc := &http.Client{}
+func getBookInfo(bi *bookInfo, nl *novel, noveUrl, proxyUrl string) bool {
+	transport := &http.Transport{}
+	if v, _ := url.Parse(proxyUrl); v.Host != "" {
+		transport.Proxy = http.ProxyURL(v)
+	}
+
+	hc := &http.Client{
+		Transport: transport,
+	}
 	buf := &bytes.Buffer{}
 	viewSource(noveUrl, nl.charset, buf, hc, 3)
 
@@ -152,6 +160,7 @@ func NovelDownload(noveUrl string) bool {
 	}
 
 	nitem := &novel{}
+	nitem.proxy = v["proxy"].(string)
 	nitem.wetsite = v["wetsite"].(string)
 	nitem.charset = v["charset"].(string)
 	nitem.menuRefer = v["menuRefer"].(string)
@@ -164,13 +173,10 @@ func NovelDownload(noveUrl string) bool {
 
 	bi := bookInfo{}
 
-	if !getBookInfo(&bi, nitem, noveUrl) {
+	if !getBookInfo(&bi, nitem, noveUrl, nitem.proxy) {
 		fmt.Println("parse website tag err")
 		return false
 	}
-
-	hc := &http.Client{}
-	buf := &bytes.Buffer{}
 
 	f, err := os.Create(bi.name + ".txt")
 	if err != nil {
@@ -178,6 +184,17 @@ func NovelDownload(noveUrl string) bool {
 		return false
 	}
 	defer f.Close()
+
+	transport := &http.Transport{}
+	if v, _ := url.Parse(nitem.proxy); v.Host != "" {
+		transport.Proxy = http.ProxyURL(v)
+		fmt.Println("ok", nitem.proxy)
+	}
+
+	hc := &http.Client{
+		Transport: transport,
+	}
+	buf := &bytes.Buffer{}
 
 	nChapter := len(bi.chtUrlList)
 	for i := 0; i < nChapter; i++ {

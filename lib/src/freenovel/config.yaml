@@ -1,4 +1,5 @@
 ﻿www.xxbiquge.com:
+  proxy: ""
   wetsite: "www.xxbiquge.com"
   charset: "utf-8"
   menuRefer: ""
@@ -9,6 +10,7 @@
   chtContent: "#content"
   chtContentStrip: ""
 www.qu.la:
+  proxy: ""
   wetsite: "www.qu.la"
   charset: "utf-8"
   menuRefer: ""
@@ -19,6 +21,7 @@ www.qu.la:
   chtContent: "#content"
   chtContentStrip: "<script>chaptererror();</script>"
 www.zwdu.com:
+  proxy: ""
   wetsite: "www.zwdu.com"
   charset: "gbk"
   menuRefer: ""
@@ -29,6 +32,7 @@ www.zwdu.com:
   chtContent: "#content"
   chtContentStrip: ""    
 www.23us.com:
+  proxy: ""
   wetsite: "www.23us.com"
   charset: "gbk"
   menuRefer: ""
@@ -39,6 +43,7 @@ www.23us.com:
   chtContent: "#contents"
   chtContentStrip: "顶点小说 ２３ＵＳ．ＣＯＭ更新最快"
 www.88dushu.com:
+  proxy: ""
   wetsite: "www.88dushu.com"
   charset: "gbk"
   menuRefer: ""
@@ -49,6 +54,7 @@ www.88dushu.com:
   chtContent: "div.yd_text2"
   chtContentStrip: ""
 www.biqudao.com:
+  proxy: ""
   wetsite: "www.biqudao.com"
   charset: "utf-8"
   menuRefer: ""
@@ -59,6 +65,7 @@ www.biqudao.com:
   chtContent: "#content"
   chtContentStrip: ""
 www.shoujikanshu.org:
+  proxy: ""
   wetsite: "www.shoujikanshu.org"
   charset: "gb2312"
   menuRefer: ""
@@ -67,4 +74,15 @@ www.shoujikanshu.org:
   chtRefer: ""
   chtTitle: "div.subNav h1"
   chtContent: "div.content"
+  chtContentStrip: ""
+www.xiaoxiaoshuwu.com:
+  proxy: ""
+  wetsite: "www.xiaoxiaoshuwu.com"
+  charset: "gbk"
+  menuRefer: ""
+  novelName: "div.title h3"
+  menuList: "div.chapter ul li a"
+  chtRefer: ""
+  chtTitle: "div.content h3"
+  chtContent: "#chapterContent"
   chtContentStrip: ""
