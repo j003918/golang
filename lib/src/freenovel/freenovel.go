@@ -14,7 +14,7 @@ import (
 	"github.com/axgle/mahonia"
 )
 
-type Novel struct {
+type novel struct {
 	wetsite         string
 	charset         string
 	menuRefer       string
@@ -32,11 +32,11 @@ type bookInfo struct {
 	chtUrlList  []string
 }
 
-var mapNovel map[string]*Novel = make(map[string]*Novel)
+var mapNovel map[string]*novel = make(map[string]*novel)
 var chtReplacer = strings.NewReplacer("<br>", "\r\n", "<br/>", "\r\n", "<br />", "\r\n")
 
 func init() {
-	mapNovel["www.xxbiquge.com"] = &Novel{
+	mapNovel["www.xxbiquge.com"] = &novel{
 		wetsite:         "www.xxbiquge.com",
 		charset:         "utf-8",
 		menuRefer:       "",
@@ -48,7 +48,7 @@ func init() {
 		chtContentStrip: "",
 	}
 
-	mapNovel["www.zwdu.com"] = &Novel{
+	mapNovel["www.zwdu.com"] = &novel{
 		wetsite:         "www.zwdu.com",
 		charset:         "gbk",
 		menuRefer:       "",
@@ -60,7 +60,7 @@ func init() {
 		chtContentStrip: "",
 	}
 
-	mapNovel["www.23us.com"] = &Novel{
+	mapNovel["www.23us.com"] = &novel{
 		wetsite:         "www.23us.com",
 		charset:         "gbk",
 		menuRefer:       "",
@@ -72,7 +72,7 @@ func init() {
 		chtContentStrip: "顶点小说 ２３ＵＳ．ＣＯＭ更新最快",
 	}
 
-	mapNovel["www.88dushu.com"] = &Novel{
+	mapNovel["www.88dushu.com"] = &novel{
 		wetsite:         "www.88dushu.com",
 		charset:         "gbk",
 		menuRefer:       "",
@@ -84,7 +84,7 @@ func init() {
 		chtContentStrip: "",
 	}
 
-	mapNovel["www.qu.la"] = &Novel{
+	mapNovel["www.qu.la"] = &novel{
 		wetsite:         "www.qu.la",
 		charset:         "utf-8",
 		menuRefer:       "",
@@ -96,7 +96,7 @@ func init() {
 		chtContentStrip: "<script>chaptererror();</script>",
 	}
 
-	mapNovel["www.biqudao.com"] = &Novel{
+	mapNovel["www.biqudao.com"] = &novel{
 		wetsite:         "www.biqudao.com",
 		charset:         "utf-8",
 		menuRefer:       "",
@@ -108,7 +108,7 @@ func init() {
 		chtContentStrip: "",
 	}
 
-	mapNovel["www.shoujikanshu.org"] = &Novel{
+	mapNovel["www.shoujikanshu.org"] = &novel{
 		wetsite:         "www.shoujikanshu.org",
 		charset:         "gb2312",
 		menuRefer:       "",
@@ -163,7 +163,7 @@ RETRYGET:
 	}
 }
 
-func getBookInfo(bi *bookInfo, nl *Novel, noveUrl string) bool {
+func getBookInfo(bi *bookInfo, nl *novel, noveUrl string) bool {
 	hc := &http.Client{}
 	buf := &bytes.Buffer{}
 	viewSource(noveUrl, nl.charset, buf, hc, 3)
