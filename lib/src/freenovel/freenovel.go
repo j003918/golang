@@ -71,7 +71,8 @@ func getBookInfo(bi *bookInfo, nl *novel, noveUrl, proxyUrl string) bool {
 	strItemLink := "href"
 	if strUrl, ok := nodes.Eq(0).Attr(strItemLink); ok {
 		if strUrl[0] == '/' {
-			strPreUrl = "http://" + nl.wetsite
+			uu, _ := url.Parse(noveUrl)
+			strPreUrl = uu.Scheme + "://" + uu.Host
 		} else {
 			urlIdx := strings.LastIndex(noveUrl, "/")
 			strPreUrl = noveUrl[0 : urlIdx+1]
@@ -138,6 +139,9 @@ func NovelDownload(noveUrl string) bool {
 	hc := newNovelHttp(nitem.proxy)
 	req := newNovelRequest("GET", "", "")
 	req.Header.Set("Referer", noveUrl)
+	req.Header.Set("Connection", "keep-alive")
+	req.Header.Set("DNT", "1")
+	req.Header.Set("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/59.0.3071.115 Safari/537.36")
 	buf := &bytes.Buffer{}
 
 	nChapter := len(bi.chtUrlList)
@@ -145,6 +149,7 @@ func NovelDownload(noveUrl string) bool {
 		func(strTitle, strUrl string) {
 			req.URL, _ = url.Parse(strUrl)
 			getBodyByReq(hc, req, nitem.charset, buf)
+			//getBodyByUrl(hc, strUrl, nitem.charset, buf)
 			doc, err := goquery.NewDocumentFromReader(buf)
 			if err != nil {
 				fmt.Println(err)
@@ -161,8 +166,7 @@ func NovelDownload(noveUrl string) bool {
 				fmt.Println("get charpter error:", strTitle, strUrl)
 			}
 
-			//f.WriteString(strTitle + "\r\n\r\n")
-			f.WriteString(doc.Find(nitem.chtTitle).Text() + "\r\n\r\n")
+			f.WriteString(strTitle + "\r\n\r\n")
 
 			f.WriteString(strContent)
 			f.WriteString("\r\n")
