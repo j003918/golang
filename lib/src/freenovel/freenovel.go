@@ -5,13 +5,11 @@ import (
 	"bytes"
 	"fmt"
 	"io/ioutil"
-	"net/http"
 	"net/url"
 	"os"
 	"strings"
 
 	"github.com/PuerkitoBio/goquery"
-	"github.com/axgle/mahonia"
 	"github.com/go-yaml/yaml"
 )
 
@@ -40,67 +38,20 @@ var mapYaml map[interface{}]interface{} = make(map[interface{}]interface{})
 func init() {
 	data, err := ioutil.ReadFile("config.yaml")
 	if err != nil {
-		fmt.Println(err)
+		panic(err)
 	}
 
 	err = yaml.Unmarshal(data, &mapYaml)
 	if err != nil {
-		fmt.Printf("error: %v", err)
-	}
-}
-
-func viewSource(strUrl, charset string, outBuf *bytes.Buffer, hc *http.Client, tryCount int) {
-	outBuf.Reset()
-	nTry := 0
-	if tryCount < 1 {
-		tryCount = 1
-	}
-RETRYGET:
-	func() {
-		rsp, err := hc.Get(strUrl)
-		if err != nil {
-			fmt.Println(err)
-			return
-		}
-		defer rsp.Body.Close()
-
-		p, err := ioutil.ReadAll(rsp.Body)
-		if err != nil {
-			fmt.Println(err)
-			return
-		}
-
-		switch charset {
-		case "gb2312":
-			outBuf.WriteString(mahonia.NewDecoder("gbk").ConvertByte(p))
-		case "gbk":
-			outBuf.WriteString(mahonia.NewDecoder("gbk").ConvertByte(p))
-		case "gb18030":
-			outBuf.WriteString(mahonia.NewDecoder("gb18030").ConvertByte(p))
-		case "utf-16":
-			outBuf.WriteString(mahonia.NewDecoder("utf-16").ConvertByte(p))
-		default:
-			outBuf.Write(p)
-		}
-	}()
-
-	if outBuf.Len() == 0 && nTry < tryCount {
-		nTry += 1
-		goto RETRYGET
+		panic(err)
 	}
 }
 
 func getBookInfo(bi *bookInfo, nl *novel, noveUrl, proxyUrl string) bool {
-	transport := &http.Transport{}
-	if v, _ := url.Parse(proxyUrl); v.Host != "" {
-		transport.Proxy = http.ProxyURL(v)
-	}
+	hc := newNovelHttp(proxyUrl)
 
-	hc := &http.Client{
-		Transport: transport,
-	}
 	buf := &bytes.Buffer{}
-	viewSource(noveUrl, nl.charset, buf, hc, 3)
+	getBodyByUrl(hc, noveUrl, nl.charset, buf)
 
 	doc, err := goquery.NewDocumentFromReader(buf)
 	if err != nil {
@@ -184,22 +135,16 @@ func NovelDownload(noveUrl string) bool {
 		return false
 	}
 	defer f.Close()
-
-	transport := &http.Transport{}
-	if v, _ := url.Parse(nitem.proxy); v.Host != "" {
-		transport.Proxy = http.ProxyURL(v)
-		fmt.Println("ok", nitem.proxy)
-	}
-
-	hc := &http.Client{
-		Transport: transport,
-	}
+	hc := newNovelHttp(nitem.proxy)
+	req := newNovelRequest("GET", "", "")
+	req.Header.Set("Referer", noveUrl)
 	buf := &bytes.Buffer{}
 
 	nChapter := len(bi.chtUrlList)
 	for i := 0; i < nChapter; i++ {
 		func(strTitle, strUrl string) {
-			viewSource(strUrl, nitem.charset, buf, hc, 3)
+			req.URL, _ = url.Parse(strUrl)
+			getBodyByReq(hc, req, nitem.charset, buf)
 			doc, err := goquery.NewDocumentFromReader(buf)
 			if err != nil {
 				fmt.Println(err)
@@ -216,7 +161,9 @@ func NovelDownload(noveUrl string) bool {
 				fmt.Println("get charpter error:", strTitle, strUrl)
 			}
 
-			f.WriteString(strTitle + "\r\n\r\n")
+			//f.WriteString(strTitle + "\r\n\r\n")
+			f.WriteString(doc.Find(nitem.chtTitle).Text() + "\r\n\r\n")
+
 			f.WriteString(strContent)
 			f.WriteString("\r\n")
 			fmt.Println(i+1, "/", nChapter, strTitle, strUrl)
