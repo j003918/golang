@@ -21,7 +21,7 @@ func newNovelHttp(proxyUrl string) *http.Client {
 
 	hc := &http.Client{
 		Transport: transport,
-		//Timeout:   60 * time.Second,
+		Timeout:   60 * time.Second,
 	}
 
 	return hc
