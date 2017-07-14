@@ -63,8 +63,9 @@ func (nd *novelDownloader) Start(url string) {
 	nd.requestMenu()
 	nd.worker()
 	nd.wg.Wait()
-	nd.save2File()
-	fmt.Println("saved to file", nd.name+".txt")
+	if nd.save2File() {
+		fmt.Println("saved to file", nd.name+".txt")
+	}
 }
 
 func (nd *novelDownloader) requestMenu() {
@@ -83,6 +84,7 @@ func (nd *novelDownloader) requestMenu() {
 
 	itemCount := nodes.Length()
 	if itemCount <= 0 {
+		fmt.Println("no menu find")
 		return
 	}
 
@@ -177,11 +179,16 @@ func (nd *novelDownloader) worker() {
 	}
 }
 
-func (nd *novelDownloader) save2File() {
+func (nd *novelDownloader) save2File() bool {
+	if nd.chapters.Len() == 0 {
+		fmt.Println("no content")
+		return false
+	}
+
 	f, err := os.Create(nd.name + ".txt")
 	if err != nil {
 		fmt.Println(err)
-		return
+		return false
 	}
 	defer f.Close()
 
@@ -195,6 +202,7 @@ func (nd *novelDownloader) save2File() {
 		f.WriteString(cht.conent)
 		nd.chapters.Remove(e)
 	}
+	return true
 }
 
 func init() {
@@ -232,16 +240,18 @@ func getWebsite(novelUrl string) *website {
 	}
 
 	wi := &website{}
-	wi.proxy = ws["proxy"].(string)
+	if _, ok := ws["proxy"]; ok {
+		wi.proxy = ws["proxy"].(string)
+	}
+	if _, ok := ws["chtContentStrip"]; ok {
+		wi.chtContentStrip = ws["chtContentStrip"].(string)
+	}
 	wi.wetsite = ws["wetsite"].(string)
 	wi.charset = ws["charset"].(string)
-	wi.menuRefer = ws["menuRefer"].(string)
 	wi.novelName = ws["novelName"].(string)
 	wi.menuList = ws["menuList"].(string)
-	wi.chtRefer = ws["chtRefer"].(string)
 	wi.chtTitle = ws["chtTitle"].(string)
 	wi.chtContent = ws["chtContent"].(string)
-	wi.chtContentStrip = ws["chtContentStrip"].(string)
 
 	return wi
 }
