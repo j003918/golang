@@ -1,19 +1,25 @@
-// freenovel project freenovel.go
+// novel
 package freenovel
 
 import (
 	"bytes"
+	"container/list"
 	"fmt"
 	"io/ioutil"
+	"net/http"
 	"net/url"
 	"os"
 	"strings"
+	"sync"
 
 	"github.com/PuerkitoBio/goquery"
 	"github.com/go-yaml/yaml"
 )
 
-type novel struct {
+var chtReplacer = strings.NewReplacer("<br>", "\r\n", "<br/>", "\r\n", "<br />", "\r\n")
+var mapYaml map[interface{}]interface{} = make(map[interface{}]interface{})
+
+type website struct {
 	proxy           string
 	wetsite         string
 	charset         string
@@ -26,17 +32,173 @@ type novel struct {
 	chtContentStrip string
 }
 
-type bookInfo struct {
-	name        string
-	chtNameList []string
-	chtUrlList  []string
+type chapter struct {
+	idx        int
+	url        string
+	menuTitle  string
+	chaptTitle string
+	conent     string
+	stats      int
 }
 
-var chtReplacer = strings.NewReplacer("<br>", "\r\n", "<br/>", "\r\n", "<br />", "\r\n")
-var mapYaml map[interface{}]interface{} = make(map[interface{}]interface{})
+type novelDownloader struct {
+	wg       *sync.WaitGroup
+	hc       *http.Client
+	ws       *website
+	chapters *list.List
+	lock     *sync.Mutex
+	url      string
+	name     string
+}
+
+func (nd *novelDownloader) Start(url string) {
+	wi := getWebsite(url)
+	if wi == nil {
+		return
+	}
+
+	nd.ws = wi
+	nd.url = url
+	nd.hc = newNovelHttp(wi.proxy)
+	nd.requestMenu()
+	nd.worker()
+	nd.wg.Wait()
+	nd.save2File()
+	fmt.Println("saved to file", nd.name+".txt")
+}
+
+func (nd *novelDownloader) requestMenu() {
+	buf := &bytes.Buffer{}
+	req := newNovelRequest("GET", nd.url, "")
+	getBodyByReq(nd.hc, req, nd.ws.charset, buf)
+
+	doc, err := goquery.NewDocumentFromReader(buf)
+	if err != nil {
+		fmt.Println(err)
+		return
+	}
+
+	nd.name = doc.Find(nd.ws.novelName).Text()
+	nodes := doc.Find(nd.ws.menuList)
+
+	itemCount := nodes.Length()
+	if itemCount <= 0 {
+		return
+	}
+
+	strPreUrl := ""
+	strItemLink := "href"
+	if strUrl, ok := nodes.Eq(0).Attr(strItemLink); ok {
+		if strUrl[0] == '/' {
+			uu, _ := url.Parse(nd.url)
+			strPreUrl = uu.Scheme + "://" + uu.Host
+		} else {
+			urlIdx := strings.LastIndex(nd.url, "/")
+			strPreUrl = nd.url[0 : urlIdx+1]
+		}
+	}
+
+	for i := 0; i < itemCount; i++ {
+		v := nodes.Eq(i)
+		strTitle := v.Text()
+		strUrl, _ := v.Attr(strItemLink)
+		if strTitle != "" {
+			cht := &chapter{
+				idx:       i,
+				url:       strPreUrl + strUrl,
+				menuTitle: strTitle,
+			}
+			nd.chapters.PushBack(cht)
+			fmt.Println("add chapter", strTitle, strPreUrl+strUrl)
+		}
+	}
+}
+
+func (nd *novelDownloader) getDownload() *chapter {
+	nd.lock.Lock()
+	defer nd.lock.Unlock()
+
+	for e := nd.chapters.Front(); e != nil; e = e.Next() {
+		cht := e.Value.(*chapter)
+		if cht.stats == 0 {
+			cht.stats = 1
+			return cht
+		}
+	}
+
+	return nil
+}
+
+func (nd *novelDownloader) requestChapter() {
+	defer nd.wg.Done()
+	buf := &bytes.Buffer{}
+	for {
+		cht := nd.getDownload()
+
+		if cht != nil {
+
+			req := newNovelRequest("GET", cht.url, "")
+			req.Header.Set("Referer", nd.url)
+			req.Header.Set("Connection", "keep-alive")
+			req.Header.Set("DNT", "1")
+			req.Header.Set("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/59.0.3071.115 Safari/537.36")
+
+			getBodyByReq(nd.hc, req, nd.ws.charset, buf)
+			doc, err := goquery.NewDocumentFromReader(buf)
+			if err != nil {
+				fmt.Println(err)
+				continue
+			}
+
+			strContentHtml, _ := doc.Find(nd.ws.chtContent).Html()
+			strContent := chtReplacer.Replace(strContentHtml)
+			strTitle := doc.Find(nd.ws.chtTitle).Text()
+			if nd.ws.chtContentStrip != "" {
+				strContent = strings.Replace(strContent, nd.ws.chtContentStrip, "", -1)
+			}
+
+			if strContent == "" {
+				fmt.Println("get charpter error:", strTitle, cht.url)
+			}
+
+			cht.chaptTitle = strTitle
+			cht.conent = strContent
+			fmt.Println("download chapter", cht.menuTitle, cht.url)
+		} else {
+			break
+		}
+	}
+}
+
+func (nd *novelDownloader) worker() {
+	for i := 0; i < 10; i++ {
+		nd.wg.Add(1)
+		go nd.requestChapter()
+	}
+}
+
+func (nd *novelDownloader) save2File() {
+	f, err := os.Create(nd.name + ".txt")
+	if err != nil {
+		fmt.Println(err)
+		return
+	}
+	defer f.Close()
+
+	var n *list.Element
+	for e := nd.chapters.Front(); e != nil; e = n {
+		n = e.Next()
+		cht := e.Value.(*chapter)
+		f.WriteString("\r\n\r\n")
+		f.WriteString(cht.chaptTitle)
+		f.WriteString("\r\n\r\n")
+		f.WriteString(cht.conent)
+		nd.chapters.Remove(e)
+	}
+}
 
 func init() {
-	data, err := ioutil.ReadFile("config.yaml")
+	data, err := ioutil.ReadFile("config.yml")
 	if err != nil {
 		panic(err)
 	}
@@ -47,133 +209,39 @@ func init() {
 	}
 }
 
-func getBookInfo(bi *bookInfo, nl *novel, noveUrl, proxyUrl string) bool {
-	hc := newNovelHttp(proxyUrl)
+func NewNovelDownloader() *novelDownloader {
+	return &novelDownloader{
+		wg: &sync.WaitGroup{},
 
-	buf := &bytes.Buffer{}
-	getBodyByUrl(hc, noveUrl, nl.charset, buf)
-
-	doc, err := goquery.NewDocumentFromReader(buf)
-	if err != nil {
-		fmt.Println(err)
-		return false
-	}
-
-	bi.name = doc.Find(nl.novelName).Text()
-	nodes := doc.Find(nl.menuList)
-
-	itemCount := nodes.Length()
-	if itemCount <= 0 {
-		return false
-	}
-
-	strPreUrl := ""
-	strItemLink := "href"
-	if strUrl, ok := nodes.Eq(0).Attr(strItemLink); ok {
-		if strUrl[0] == '/' {
-			uu, _ := url.Parse(noveUrl)
-			strPreUrl = uu.Scheme + "://" + uu.Host
-		} else {
-			urlIdx := strings.LastIndex(noveUrl, "/")
-			strPreUrl = noveUrl[0 : urlIdx+1]
-		}
-	}
-
-	for i := 0; i < itemCount; i++ {
-		v := nodes.Eq(i)
-		strTitle := v.Text()
-		strUrl, _ := v.Attr(strItemLink)
-		if strTitle != "" {
-			bi.chtUrlList = append(bi.chtUrlList, strPreUrl+strUrl)
-			bi.chtNameList = append(bi.chtNameList, strTitle)
-		}
-	}
-
-	return true
-}
-
-func WebsiteList() {
-	for k, _ := range mapYaml {
-		fmt.Println(k)
+		chapters: list.New(),
+		lock:     &sync.Mutex{},
 	}
 }
 
-func NovelDownload(noveUrl string) bool {
-	u, err := url.Parse(noveUrl)
+func getWebsite(novelUrl string) *website {
+	u, err := url.Parse(novelUrl)
 	if err != nil {
 		fmt.Println(err)
-		return false
+		return nil
 	}
 
-	v, ok := mapYaml[u.Host].(map[interface{}]interface{})
+	ws, ok := mapYaml[u.Host].(map[interface{}]interface{})
 	if !ok {
-		fmt.Println("not supported website:", noveUrl)
-		return false
+		fmt.Println("not supported website:", novelUrl)
+		return nil
 	}
 
-	nitem := &novel{}
-	nitem.proxy = v["proxy"].(string)
-	nitem.wetsite = v["wetsite"].(string)
-	nitem.charset = v["charset"].(string)
-	nitem.menuRefer = v["menuRefer"].(string)
-	nitem.novelName = v["novelName"].(string)
-	nitem.menuList = v["menuList"].(string)
-	nitem.chtRefer = v["chtRefer"].(string)
-	nitem.chtTitle = v["chtTitle"].(string)
-	nitem.chtContent = v["chtContent"].(string)
-	nitem.chtContentStrip = v["chtContentStrip"].(string)
+	wi := &website{}
+	wi.proxy = ws["proxy"].(string)
+	wi.wetsite = ws["wetsite"].(string)
+	wi.charset = ws["charset"].(string)
+	wi.menuRefer = ws["menuRefer"].(string)
+	wi.novelName = ws["novelName"].(string)
+	wi.menuList = ws["menuList"].(string)
+	wi.chtRefer = ws["chtRefer"].(string)
+	wi.chtTitle = ws["chtTitle"].(string)
+	wi.chtContent = ws["chtContent"].(string)
+	wi.chtContentStrip = ws["chtContentStrip"].(string)
 
-	bi := bookInfo{}
-
-	if !getBookInfo(&bi, nitem, noveUrl, nitem.proxy) {
-		fmt.Println("parse website tag err")
-		return false
-	}
-
-	f, err := os.Create(bi.name + ".txt")
-	if err != nil {
-		fmt.Println(err)
-		return false
-	}
-	defer f.Close()
-	hc := newNovelHttp(nitem.proxy)
-	req := newNovelRequest("GET", "", "")
-	req.Header.Set("Referer", noveUrl)
-	req.Header.Set("Connection", "keep-alive")
-	req.Header.Set("DNT", "1")
-	req.Header.Set("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/59.0.3071.115 Safari/537.36")
-	buf := &bytes.Buffer{}
-
-	nChapter := len(bi.chtUrlList)
-	for i := 0; i < nChapter; i++ {
-		func(strTitle, strUrl string) {
-			req.URL, _ = url.Parse(strUrl)
-			getBodyByReq(hc, req, nitem.charset, buf)
-			//getBodyByUrl(hc, strUrl, nitem.charset, buf)
-			doc, err := goquery.NewDocumentFromReader(buf)
-			if err != nil {
-				fmt.Println(err)
-				return
-			}
-
-			strContentHtml, _ := doc.Find(nitem.chtContent).Html()
-			strContent := chtReplacer.Replace(strContentHtml)
-			if nitem.chtContentStrip != "" {
-				strContent = strings.Replace(strContent, nitem.chtContentStrip, "", -1)
-			}
-
-			if strContent == "" {
-				fmt.Println("get charpter error:", strTitle, strUrl)
-			}
-
-			f.WriteString(strTitle + "\r\n\r\n")
-
-			f.WriteString(strContent)
-			f.WriteString("\r\n")
-			fmt.Println(i+1, "/", nChapter, strTitle, strUrl)
-			f.Sync()
-		}(bi.chtNameList[i], bi.chtUrlList[i])
-	}
-
-	return true
+	return wi
 }

@@ -1,4 +1,4 @@
-﻿www.xxbiquge.com:
+www.xxbiquge.com:
   proxy: ""
   wetsite: "www.xxbiquge.com"
   charset: "utf-8"
@@ -72,7 +72,7 @@ www.shoujikanshu.org:
   novelName: "div.box-artic h1"
   menuList: "div.list li a"
   chtRefer: ""
-  chtTitle: "div.subNav h1"
+  chtTitle: "div.box-artic h1"
   chtContent: "div.content"
   chtContentStrip: ""
 www.xiaoxiaoshuwu.com:
