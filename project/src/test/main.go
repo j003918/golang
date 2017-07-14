@@ -6,12 +6,11 @@ import (
 )
 
 func main() {
-	freenovel.WebsiteList()
-
-	bu := ""
+	nd := freenovel.NewNovelDownloader()
+	novelUrl := ""
 	for {
 		fmt.Print("Please input novel url: ")
-		fmt.Scanln(&bu)
-		freenovel.NovelDownload(bu)
+		fmt.Scanln(&novelUrl)
+		nd.Start(novelUrl)
 	}
 }
