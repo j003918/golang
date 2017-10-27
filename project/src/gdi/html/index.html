@@ -1,0 +1,568 @@
+<!DOCTYPE HTML>
+<html>
+  
+  <head>
+    <meta charset="UTF-8" />
+    <title>Login-index</title>
+    <style>
+		html { 
+		background-color: #E9EEF0; 
+		font-size:12px; 
+		}  
+		.panel{ 
+		float:left; width:99%; 
+		margin:2px; 
+		padding:3px; 
+		border:1px solid #690; 
+		} 
+		.panel dl{float:left;}
+	</style>
+  </head>
+  
+  <body>
+	<h1 align="center">复发性流产病例大数据录入系统</h1>
+    <form action="/gdi" method="post">
+      <div class="panel">
+        <dl>
+          <dt>病人ID</dt>
+          <dd>
+            <input type="text" name="BRID" value="" /></dd>
+        </dl>
+        <dl>
+          <dt>就诊NO</dt>
+          <dd>
+            <input type="text" name="JZNO" value="" /></dd>
+        </dl>
+        <dl>
+          <dt>姓名</dt>
+          <dd>
+            <input type="text" name="XM" value="" /></dd>
+        </dl>
+        <dl>
+          <dt>年龄</dt>
+          <dd>
+            <input type="text" name="NL" value="" /></dd>
+        </dl>
+        <dl>
+          <dt>手机号</dt>
+          <dd>
+            <input type="text" name="SJH" value="" /></dd>
+        </dl>
+        <dl>
+          <dt>学历</dt>
+          <dd>
+            <input type="text" name="XL" value="" /></dd>
+        </dl>
+        <dl>
+          <dt>现病史</dt>
+          <dd>
+            <textarea name="XBS" rows="5" cols="60" value=""></textarea>
+          </dd>
+        </dl>
+        <dl>
+          <dt>既往史</dt>
+          <dd>
+            <textarea name="JWS" rows="5" cols="60" value=""></textarea>
+          </dd>
+        </dl>
+      </div>
+      <div class="panel">
+        <dl>
+          <dt>生育史-总共怀孕</dt>
+          <dd>
+            <input type="text" name="SYS_ZGHY" value="" /></dd>
+        </dl>
+        <dl>
+          <dt>生育史-足月产</dt>
+          <dd>
+            <input type="text" name="SYS_ZYC" value="" /></dd>
+        </dl>
+        <dl>
+          <dt>生育史-早产</dt>
+          <dd>
+            <input type="text" name="SYS_ZC" value="" /></dd>
+        </dl>
+        <dl>
+          <dt>生育史-人流（药流）</dt>
+          <dd>
+            <input type="text" name="SYS_RL" value="" /></dd>
+        </dl>
+        <dl>
+          <dt>生育史-难免流产（胎停）</dt>
+          <dd>
+            <input type="text" name="SYS_NMLC" value="" /></dd>
+        </dl>
+        <dl>
+          <dt>生育史-生化妊娠</dt>
+          <dd>
+            <input type="text" name="SYS_SHRS" value="" /></dd>
+        </dl>
+        <dl>
+          <dt>生育史-宫外孕</dt>
+          <dd>
+            <input type="text" name="SYS_GWY" value="" /></dd>
+        </dl>
+      </div>
+      <div class="panel">
+        <dl>
+          <dt>流产史-次数</dt>
+          <dd>
+            <input type="text" name="LCS_CS" value="" /></dd>
+        </dl>
+        <dl>
+          <dt>流产史-流产时间</dt>
+          <dd>
+            <input type="text" name="LCS_LCSJ" value="" /></dd>
+        </dl>
+        <dl>
+          <dt>流产史-怀孕天数</dt>
+          <dd>
+            <input type="text" name="LCS_HYTS" value="" /></dd>
+        </dl>
+        <dl>
+          <dt>流产史-孕囊</dt>
+          <dd>
+            <input type="text" name="LCS_YN" value="" /></dd>
+        </dl>
+        <dl>
+          <dt>流产史-胚芽</dt>
+          <dd>
+            <input type="text" name="LCS_PY" value="" /></dd>
+        </dl>
+        <dl>
+          <dt>流产史-胎心</dt>
+          <dd>
+            <input type="text" name="LCS_TX" value="" /></dd>
+        </dl>
+        <dl>
+          <dt>流产史-自然流产</dt>
+          <dd>
+            <input type="text" name="LCS_ZRLC" value="" /></dd>
+        </dl>
+        <dl>
+          <dt>流产史-是否清宫</dt>
+          <dd>
+            <input type="text" name="LCS_SFQG" value="" /></dd>
+        </dl>
+        <dl>
+          <dt>流产史-胎儿染色体</dt>
+          <dd>
+            <input type="text" name="LCS_TERST" value="" /></dd>
+        </dl>
+      </div>
+      <div class="panel">
+        <dl>
+          <dt>月经史-周期</dt>
+          <dd>
+            <input type="text" name="YJS_ZQ" value="" /></dd>
+        </dl>
+        <dl>
+          <dt>月经史-痛经（±）</dt>
+          <dd>
+            <input type="text" name="YJS_TJ" value="" /></dd>
+        </dl>
+        <dl>
+          <dt>夫妻双方染色体情况</dt>
+          <dd>
+            <input type="text" name="FQSFRSTQK" value="" /></dd>
+        </dl>
+        <dl>
+          <dt>男方精液常规</dt>
+          <dd>
+            <input type="text" name="NFJYCG" value="" /></dd>
+        </dl>
+        <dl>
+          <dt>本人慢性疾病</dt>
+          <dd>
+            <input type="text" name="BRMXJB" value="" /></dd>
+        </dl>
+        <dl>
+          <dt>父母慢性疾病</dt>
+          <dd>
+            <input type="text" name="FMMXJB" value="" /></dd>
+        </dl>
+        <dl>
+          <dt>目前是/否已怀孕</dt>
+          <dd>
+            <input type="text" name="MQSFYHY" value="" /></dd>
+        </dl>
+        <dl>
+          <dt>目前是/否用药</dt>
+          <dd>
+            <input type="text" name="MQSFYY" value="" /></dd>
+        </dl>
+        <dl>
+          <dt>目前用药</dt>
+          <dd>
+            <input type="text" name="MQYY" value="" /></dd>
+        </dl>
+      </div>
+      <div class="panel">
+        <dl>
+          <dt>检查性激素-FSH</dt>
+          <dd>
+            <input type="text" name="JCXJS_FSH" value="" /></dd>
+        </dl>
+        <dl>
+          <dt>检查性激素-LH</dt>
+          <dd>
+            <input type="text" name="JCXJS_LH" value="" /></dd>
+        </dl>
+        <dl>
+          <dt>检查性激素-E</dt>
+          <dd>
+            <input type="text" name="JCXJS_E" value="" /></dd>
+        </dl>
+        <dl>
+          <dt>检查性激素-P</dt>
+          <dd>
+            <input type="text" name="JCXJS_P" value="" /></dd>
+        </dl>
+        <dl>
+          <dt>检查性激素-T</dt>
+          <dd>
+            <input type="text" name="JCXJS_T" value="" /></dd>
+        </dl>
+        <dl>
+          <dt>检查性激素-PRL</dt>
+          <dd>
+            <input type="text" name="JCXJS_PRL" value="" /></dd>
+        </dl>
+      </div>
+      <div class="panel">
+        <dl>
+          <dt>胰岛素-0</dt>
+          <dd>
+            <input type="text" name="YDS_0" value="" /></dd>
+        </dl>
+        <dl>
+          <dt>胰岛素-60</dt>
+          <dd>
+            <input type="text" name="YDS_60" value="" /></dd>
+        </dl>
+        <dl>
+          <dt>胰岛素-120</dt>
+          <dd>
+            <input type="text" name="YDS_120" value="" /></dd>
+        </dl>
+        <dl>
+          <dt>胰岛素-180</dt>
+          <dd>
+            <input type="text" name="YDS_180" value="" /></dd>
+        </dl>
+        <dl>
+          <dt>葡萄糖-0</dt>
+          <dd>
+            <input type="text" name="PTT_0" value="" /></dd>
+        </dl>
+        <dl>
+          <dt>葡萄糖-60</dt>
+          <dd>
+            <input type="text" name="PTT_60" value="" /></dd>
+        </dl>
+        <dl>
+          <dt>葡萄糖-120</dt>
+          <dd>
+            <input type="text" name="PTT_120" value="" /></dd>
+        </dl>
+        <dl>
+          <dt>葡萄糖-180</dt>
+          <dd>
+            <input type="text" name="PTT_180" value="" /></dd>
+        </dl>
+      </div>
+      <div class="panel">
+        <dl>
+          <dt>甲状腺功能-抗-TPO</dt>
+          <dd>
+            <input type="text" name="JZXGN_K_TPO" value="" /></dd>
+        </dl>
+        <dl>
+          <dt>甲状腺功能-TSH</dt>
+          <dd>
+            <input type="text" name="JZXGN_TSH" value="" /></dd>
+        </dl>
+        <dl>
+          <dt>甲状腺功能-游离T3</dt>
+          <dd>
+            <input type="text" name="JZXGN_YLT3" value="" /></dd>
+        </dl>
+        <dl>
+          <dt>甲状腺功能-游离T4</dt>
+          <dd>
+            <input type="text" name="JZXGN_YLT4" value="" /></dd>
+        </dl>
+        <dl>
+          <dt>甲状腺功能-甲状腺球蛋白</dt>
+          <dd>
+            <input type="text" name="JZXGN_JZXQDB" value="" /></dd>
+        </dl>
+        <dl>
+          <dt>甲状腺功能-促甲状腺素受体抗体</dt>
+          <dd>
+            <input type="text" name="JZXGN_CJZXSSTKT" value="" /></dd>
+        </dl>
+        <dl>
+          <dt>甲状腺功能-抗甲状腺球蛋白抗体</dt>
+          <dd>
+            <input type="text" name="JZXGN_KJZXQDBKT" value="" /></dd>
+        </dl>
+      </div>
+      <div class="panel">
+        <dl>
+          <dt>磷脂综合征-抗心磷脂抗体IgG</dt>
+          <dd>
+            <input type="text" name="LZZHZ_KXLZKTIgG" value="" /></dd>
+        </dl>
+        <dl>
+          <dt>磷脂综合征-抗心磷脂抗体IgM</dt>
+          <dd>
+            <input type="text" name="LZZHZ_KXLZKTIgM" value="" /></dd>
+        </dl>
+        <dl>
+          <dt>磷脂综合征-抗β2糖蛋白I抗体</dt>
+          <dd>
+            <input type="text" name="LZZHZ_K2TDBIKT" value="" /></dd>
+        </dl>
+        <dl>
+          <dt>同型半胱氨酸</dt>
+          <dd>
+            <input type="text" name="TXBZAS" value="" /></dd>
+        </dl>
+        <dl>
+          <dt>血小板聚集率-最大聚集率(ADP)</dt>
+          <dd>
+            <input type="text" name="XXBJJL_ZDJJL_ADP" value="" /></dd>
+        </dl>
+        <dl>
+          <dt>血小板聚集率-最大聚集率(AA)</dt>
+          <dd>
+            <input type="text" name="XXBJJL_ZDJJL_AA" value="" /></dd>
+        </dl>
+        <dl>
+          <dt>D-二聚体</dt>
+          <dd>
+            <input type="text" name="D_EJT" value="" /></dd>
+        </dl>
+      </div>
+      <div class="panel">
+        <dl>
+          <dt>血常规-PT</dt>
+          <dd>
+            <input type="text" name="XCG_PT" value="" /></dd>
+        </dl>
+        <dl>
+          <dt>血常规-PT-INR</dt>
+          <dd>
+            <input type="text" name="XCG_PT_INR" value="" /></dd>
+        </dl>
+        <dl>
+          <dt>血常规-FIB</dt>
+          <dd>
+            <input type="text" name="XCG_FIB" value="" /></dd>
+        </dl>
+        <dl>
+          <dt>血常规-APTT</dt>
+          <dd>
+            <input type="text" name="XCG_APTT" value="" /></dd>
+        </dl>
+        <dl>
+          <dt>血常规-TT</dt>
+          <dd>
+            <input type="text" name="XCG_TT" value="" /></dd>
+        </dl>
+        <dl>
+          <dt>血常规-AT-Ш</dt>
+          <dd>
+            <input type="text" name="XCG_AT" value="" /></dd>
+        </dl>
+        <dl>
+          <dt>血常规-PC</dt>
+          <dd>
+            <input type="text" name="XCG_PC" value="" /></dd>
+        </dl>
+        <dl>
+          <dt>血常规-WBC</dt>
+          <dd>
+            <input type="text" name="XCG_WBC" value="" /></dd>
+        </dl>
+        <dl>
+          <dt>血常规-RBC</dt>
+          <dd>
+            <input type="text" name="XCG_RBC" value="" /></dd>
+        </dl>
+        <dl>
+          <dt>血常规-HGB</dt>
+          <dd>
+            <input type="text" name="XCG_HGB" value="" /></dd>
+        </dl>
+        <dl>
+          <dt>血常规-PLT</dt>
+          <dd>
+            <input type="text" name="XCG_PLT" value="" /></dd>
+        </dl>
+        <dl>
+          <dt>血常规-PCT</dt>
+          <dd>
+            <input type="text" name="XCG_PCT" value="" /></dd>
+        </dl>
+      </div>
+      <div class="panel">
+        <dl>
+          <dt>ENA-抗核抗体定量</dt>
+          <dd>
+            <input type="text" name="ENA_KHKTDL" value="" /></dd>
+        </dl>
+        <dl>
+          <dt>ENA-抗双链DNA定量</dt>
+          <dd>
+            <input type="text" name="ENA_KSLDNADL" value="" /></dd>
+        </dl>
+        <dl>
+          <dt>ENA-抗SSA抗体定量</dt>
+          <dd>
+            <input type="text" name="ENA_KSSAKTDL" value="" /></dd>
+        </dl>
+        <dl>
+          <dt>ENA-抗SSB抗体定量</dt>
+          <dd>
+            <input type="text" name="ENA_KSSBKTDL" value="" /></dd>
+        </dl>
+        <dl>
+          <dt>ENA-抗JO-1抗体定量</dt>
+          <dd>
+            <input type="text" name="ENA_KJO_1KTDL" value="" /></dd>
+        </dl>
+        <dl>
+          <dt>ENA-抗Sm抗体定量</dt>
+          <dd>
+            <input type="text" name="ENA_KSmKTDL" value="" /></dd>
+        </dl>
+        <dl>
+          <dt>ENA-抗nRNP抗体定量</dt>
+          <dd>
+            <input type="text" name="ENA_KnRNPKTDL" value="" /></dd>
+        </dl>
+        <dl>
+          <dt>ENA-抗ScL-70抗体定量</dt>
+          <dd>
+            <input type="text" name="ENA_KScL_70KTDL" value="" /></dd>
+        </dl>
+        <dl>
+          <dt>ENA-抗着丝点抗体定量</dt>
+          <dd>
+            <input type="text" name="ENA_KZSDKTDL" value="" /></dd>
+        </dl>
+        <dl>
+          <dt>ENA-组蛋白抗体定量</dt>
+          <dd>
+            <input type="text" name="ENA_ZDBKTDL" value="" /></dd>
+        </dl>
+      </div>
+      <div class="panel">
+        <dl>
+          <dt>子宫动脉阻力-左侧PSV</dt>
+          <dd>
+            <input type="text" name="ZGDMZL_ZCPSV" value="" /></dd>
+        </dl>
+        <dl>
+          <dt>子宫动脉阻力-左侧EDV</dt>
+          <dd>
+            <input type="text" name="ZGDMZL_ZCEDV" value="" /></dd>
+        </dl>
+        <dl>
+          <dt>子宫动脉阻力-左侧S/D</dt>
+          <dd>
+            <input type="text" name="ZGDMZL_ZCSD" value="" /></dd>
+        </dl>
+        <dl>
+          <dt>子宫动脉阻力-左侧RI</dt>
+          <dd>
+            <input type="text" name="ZGDMZL_ZCRI" value="" /></dd>
+        </dl>
+        <dl>
+          <dt>子宫动脉阻力-右侧PSV</dt>
+          <dd>
+            <input type="text" name="ZGDMZL_YCPSV" value="" /></dd>
+        </dl>
+        <dl>
+          <dt>子宫动脉阻力-右侧EDV</dt>
+          <dd>
+            <input type="text" name="ZGDMZL_YCEDV" value="" /></dd>
+        </dl>
+        <dl>
+          <dt>子宫动脉阻力-右侧S/D</dt>
+          <dd>
+            <input type="text" name="ZGDMZL_YCSD" value="" /></dd>
+        </dl>
+        <dl>
+          <dt>子宫动脉阻力-右侧RI</dt>
+          <dd>
+            <input type="text" name="ZGDMZL_YCRI" value="" /></dd>
+        </dl>
+      </div>
+      <div class="panel">
+        <dl>
+          <dt>BMI(kg/m*m)</dt>
+          <dd>
+            <input type="text" name="BMI" value="" /></dd>
+        </dl>
+        <dl>
+          <dt>多毛（±）</dt>
+          <dd>
+            <input type="text" name="DM" value="" /></dd>
+        </dl>
+        <dl>
+          <dt>黑棘皮（±）</dt>
+          <dd>
+            <input type="text" name="HJP" value="" /></dd>
+        </dl>
+        <dl>
+          <dt>舌苔</dt>
+          <dd>
+            <input type="text" name="ST" value="" /></dd>
+        </dl>
+        <dl>
+          <dt>脉象</dt>
+          <dd>
+            <input type="text" name="MX" value="" /></dd>
+        </dl>
+        <dl>
+          <dt>目眶黯黑</dt>
+          <dd>
+            <input type="text" name="MKZH" value="" /></dd>
+        </dl>
+        <dl>
+          <dt>面色</dt>
+          <dd>
+            <input type="text" name="MS" value="" /></dd>
+        </dl>
+        <dl>
+          <dt>腰酸</dt>
+          <dd>
+            <input type="text" name="YS" value="" /></dd>
+        </dl>
+        <dl>
+          <dt>神疲乏力</dt>
+          <dd>
+            <input type="text" name="SPFL" value="" /></dd>
+        </dl>
+        <dl>
+          <dt>头晕耳鸣</dt>
+          <dd>
+            <input type="text" name="TYEM" value="" /></dd>
+        </dl>
+        <dl>
+          <dt>有血块</dt>
+          <dd>
+            <input type="text" name="YXK" value="" /></dd>
+        </dl>
+      </div>
+      <div class="panel">
+        <div style="text-align:center;">
+          <input type="submit" value="提交"></div>
+      </div>
+    </form>
+  </body>
+
+</html>

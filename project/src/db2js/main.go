@@ -1,5 +1,13 @@
 /* liteide *.env add ENV support oci8
-MINGW64=D:/mingw-w64/mingw64
+GOROOT=d:/PortableSoftware/go
+#GOBIN=
+GOARCH=amd64
+GOOS=windows
+CGO_ENABLED=1
+
+#PATH=c:\mingw64\bin;%GOROOT%\bin;%PATH%
+
+MINGW64=D:/PortableSoftware/mingw-w64/mingw64
 instantclient=D:/instantclient_12_2
 PKG_CONFIG_PATH=%instantclient%/pkg-config
 TNS_ADMIN=%instantclient%/network/admin
