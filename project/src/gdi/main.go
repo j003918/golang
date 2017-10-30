@@ -9,6 +9,7 @@ import (
 	"strings"
 
 	_ "github.com/go-sql-driver/mysql"
+	"github.com/tealeg/xlsx"
 )
 
 var (
@@ -22,7 +23,114 @@ var (
 		else 
 			CONCAT('<dl><dt>',column_comment,'</dt><dd><textarea  name="',column_name,'" rows="5" cols=60 value="" ></textarea></dd></dl>')
 		end as HTML_TAG
-		from information_schema.columns where table_schema ='oa0618' and table_name = 'jhf_ffxlc' and column_comment <> "";
+		from information_schema.columns where table_schema ='czzyy' and table_name = 'jhf_ffxlc' and column_comment <> "";
+	`
+
+	strXlsx = `
+	select
+BRID as "病人ID"
+,JZNO as "就诊NO"
+,XM as "姓名"
+,NL as "年龄"
+,SJH as "手机号"
+,XL as "学历"
+,XBS as "现病史"
+,JWS as "既往史"
+,SYS_ZGHY as "生育史-总共怀孕"
+,SYS_ZYC as "生育史-足月产"
+,SYS_ZC as "生育史-早产"
+,SYS_RL as "生育史-人流（药流）"
+,SYS_NMLC as "生育史-难免流产（胎停）"
+,SYS_SHRS as "生育史-生化妊娠"
+,SYS_GWY as "生育史-宫外孕"
+,LCS_CS as "流产史-次数"
+,LCS_LCSJ as "流产史-流产时间"
+,LCS_HYTS as "流产史-怀孕天数"
+,LCS_YN as "流产史-孕囊"
+,LCS_PY as "流产史-胚芽"
+,LCS_TX as "流产史-胎心"
+,LCS_ZRLC as "流产史-自然流产"
+,LCS_SFQG as "流产史-是否清宫"
+,LCS_TERST as "流产史-胎儿染色体"
+,YJS_ZQ as "月经史-周期"
+,YJS_TJ as "月经史-痛经（±）"
+,FQSFRSTQK as "夫妻双方染色体情况"
+,NFJYCG as "男方精液常规"
+,BRMXJB as "本人慢性疾病"
+,FMMXJB as "父母慢性疾病"
+,MQSFYHY as "目前是/否已怀孕"
+,MQSFYY as "目前是/否用药"
+,MQYY as "目前用药"
+,JCXJS_FSH as "检查性激素-FSH"
+,JCXJS_LH as "检查性激素-LH"
+,JCXJS_E as "检查性激素-E"
+,JCXJS_P as "检查性激素-P"
+,JCXJS_T as "检查性激素-T"
+,JCXJS_PRL as "检查性激素-PRL"
+,YDS_0 as "胰岛素-0"
+,YDS_60 as "胰岛素-60"
+,YDS_120 as "胰岛素-120"
+,YDS_180 as "胰岛素-180"
+,PTT_0 as "葡萄糖-0"
+,PTT_60 as "葡萄糖-60"
+,PTT_120 as "葡萄糖-120"
+,PTT_180 as "葡萄糖-180"
+,JZXGN_K_TPO as "甲状腺功能-抗-TPO"
+,JZXGN_TSH as "甲状腺功能-TSH"
+,JZXGN_YLT3 as "甲状腺功能-游离T3"
+,JZXGN_YLT4 as "甲状腺功能-游离T4"
+,JZXGN_JZXQDB as "甲状腺功能-甲状腺球蛋白"
+,JZXGN_CJZXSSTKT as "甲状腺功能-促甲状腺素受体抗体"
+,JZXGN_KJZXQDBKT as "甲状腺功能-抗甲状腺球蛋白抗体"
+,LZZHZ_KXLZKTIgG as "磷脂综合征-抗心磷脂抗体IgG"
+,LZZHZ_KXLZKTIgM as "磷脂综合征-抗心磷脂抗体IgM"
+,LZZHZ_K2TDBIKT as "磷脂综合征-抗β2糖蛋白I抗体"
+,TXBZAS as "同型半胱氨酸"
+,XXBJJL_ZDJJL_ADP as "血小板聚集率-最大聚集率(ADP)"
+,XXBJJL_ZDJJL_AA as "血小板聚集率-最大聚集率(AA)"
+,D_EJT as "D-二聚体"
+,XCG_PT as "血常规-PT"
+,XCG_PT_INR as "血常规-PT-INR"
+,XCG_FIB as "血常规-FIB"
+,XCG_APTT as "血常规-APTT"
+,XCG_TT as "血常规-TT"
+,XCG_AT as "血常规-AT-Ш"
+,XCG_PC as "血常规-PC"
+,XCG_WBC as "血常规-WBC"
+,XCG_RBC as "血常规-RBC"
+,XCG_HGB as "血常规-HGB"
+,XCG_PLT as "血常规-PLT"
+,XCG_PCT as "血常规-PCT"
+,ENA_KHKTDL as "ENA-抗核抗体定量"
+,ENA_KSLDNADL as "ENA-抗双链DNA定量"
+,ENA_KSSAKTDL as "ENA-抗SSA抗体定量"
+,ENA_KSSBKTDL as "ENA-抗SSB抗体定量"
+,ENA_KJO_1KTDL as "ENA-抗JO-1抗体定量"
+,ENA_KSmKTDL as "ENA-抗Sm抗体定量"
+,ENA_KnRNPKTDL as "ENA-抗nRNP抗体定量"
+,ENA_KScL_70KTDL as "ENA-抗ScL-70抗体定量"
+,ENA_KZSDKTDL as "ENA-抗着丝点抗体定量"
+,ENA_ZDBKTDL as "ENA-组蛋白抗体定量"
+,ZGDMZL_ZCPSV as "子宫动脉阻力-左侧PSV"
+,ZGDMZL_ZCEDV as "子宫动脉阻力-左侧EDV"
+,ZGDMZL_ZCSD as "子宫动脉阻力-左侧S/D"
+,ZGDMZL_ZCRI as "子宫动脉阻力-左侧RI"
+,ZGDMZL_YCPSV as "子宫动脉阻力-右侧PSV"
+,ZGDMZL_YCEDV as "子宫动脉阻力-右侧EDV"
+,ZGDMZL_YCSD as "子宫动脉阻力-右侧S/D"
+,ZGDMZL_YCRI as "子宫动脉阻力-右侧RI"
+,BMI as "BMI(kg/m*m)"
+,DM as "多毛（±）"
+,HJP as "黑棘皮（±）"
+,ST as "舌苔"
+,MX as "脉象"
+,MKZH as "目眶黯黑"
+,MS as "面色"
+,YS as "腰酸"
+,SPFL as "神疲乏力"
+,TYEM as "头晕耳鸣"
+,YXK as "有血块"
+from jhf_ffxlc
 	`
 	strTabFfxlc = `
 	CREATE TABLE IF NOT EXISTS jhf_ffxlc(
@@ -358,14 +466,13 @@ values
 )
 
 func init() {
-
 	strPort := *(flag.String("port", "8080", ""))
 	strDSN := *(flag.String("dsn", "", ""))
 	flag.Parse()
 
 	httpPort = ":" + strPort
 	if strDSN == "" {
-		strDSN = `admin:admin@tcp(172.25.125.101:3306)/oa0618`
+		strDSN = `jhf:jhf@tcp(130.1.10.230:3306)/czzyy`
 	}
 
 	mydb, myerr = sql.Open("mysql", strDSN)
@@ -414,21 +521,19 @@ func gdi(w http.ResponseWriter, r *http.Request) {
 		rst, err := mydb.Exec(strSql)
 
 		if err != nil {
-			//panic(err)
 			strRspHtml = err.Error()
-			//fmt.Println(err)
 			goto RST
 		}
 
 		rowCount, _ := rst.RowsAffected()
 		if rowCount == 1 {
 			strRspHtml = "添加成功!"
-			//w.Write([]byte("add ok"))
-			//return
 			goto RST
 		}
 	}
+
 RST:
+	sql2xlsx()
 	strRspHtml = `<html><body> <div style="text-align:center;"><br><br><br><br><br><br>` + strRspHtml + `<br><a href="/">返回</a></div></body></html>`
 	w.Write([]byte(strRspHtml))
 }
@@ -440,9 +545,7 @@ func prt_html() {
 		return
 	}
 	defer rows.Close()
-	//var arrHTML [6]string
 	strHTML := ""
-	//cnt := 0
 
 	for rows.Next() {
 		err = rows.Scan(&strHTML)
@@ -450,52 +553,85 @@ func prt_html() {
 			fmt.Println(err.Error())
 			return
 		}
-		//arrHTML[cnt%6] += strHTML
-		//cnt += 1
-
 		fmt.Println(strHTML)
 	}
-	/*
-			arrHTML[0] = `<div class="leftbar"><dl>` + arrHTML[0] + `</dl></div>`
-			arrHTML[1] = `<div class="leftbar"><dl>` + arrHTML[1] + `</dl></div>`
-			arrHTML[2] = `<div class="leftbar"><dl>` + arrHTML[2] + `</dl></div>`
-			arrHTML[3] = `<div class="leftbar"><dl>` + arrHTML[3] + `</dl></div>`
-			arrHTML[4] = `<div class="leftbar"><dl>` + arrHTML[4] + `</dl></div>`
-			arrHTML[5] = `<div class="leftbar"><dl>` + arrHTML[5] + `</dl></div>`
-
-		fmt.Println(arrHTML[0])
-		fmt.Println(arrHTML[1])
-		fmt.Println(arrHTML[2])
-		fmt.Println(arrHTML[3])
-		fmt.Println(arrHTML[4])
-		fmt.Println(arrHTML[5])
-	*/
 }
 
-func prt_Excel() {
+func addRow2Sheet(s *xlsx.Sheet, args ...string) error {
+	row := s.AddRow()
+	cell := row.AddCell()
+	cell.Value = ""
 
-	//"'"&A2&"'"&",'"&B2&"'"
-
-	for i := 65; i <= 90; i++ {
-		fmt.Print(`",'"&`, string(rune(i)), `2&"'"&`)
-	}
-	fmt.Println()
-	for i := 65; i <= 90; i++ {
-		fmt.Print(`",'"&A`, string(rune(i)), `2&"'"&`)
-	}
-	fmt.Println()
-	for i := 65; i <= 90; i++ {
-		fmt.Print(`",'"&B`, string(rune(i)), `2&"'"&`)
-	}
-	fmt.Println()
-	for i := 65; i <= 90; i++ {
-		fmt.Print(`",'"&C`, string(rune(i)), `2&"'"&`)
+	for _, v := range args {
+		cell := row.AddCell()
+		cell.Value = v
 	}
 
+	return nil
+}
+
+func sql2xlsx() error {
+	f := xlsx.NewFile()
+	sheet, err := f.AddSheet("Sheet1")
+	if err != nil {
+		return err
+	}
+
+	rows, err := mydb.Query(strXlsx)
+	if err != nil {
+		return err
+	}
+	defer rows.Close()
+
+	columns, err := rows.Columns()
+
+	if err != nil {
+		return err
+	}
+
+	addRow2Sheet(sheet, columns[0:]...)
+
+	values := make([]sql.NullString, len(columns))
+	scans := make([]interface{}, len(columns))
+	cv := make([]string, len(columns))
+
+	for i := range values {
+		scans[i] = &values[i]
+	}
+
+	for rows.Next() {
+		err = rows.Scan(scans...)
+		if err != nil {
+			return err
+		}
+
+		var strVal string
+		for i, col := range values {
+			if !col.Valid {
+				strVal = ""
+			} else {
+				strVal = col.String
+			}
+			cv[i] = strVal
+		}
+
+		addRow2Sheet(sheet, cv[0:]...)
+	}
+
+	if err != nil {
+		return err
+	}
+
+	err = f.Save("./html/ffxlc.xlsx")
+	if err != nil {
+		return err
+	}
+
+	return nil
 }
 
 func main() {
-	//prt_Excel()
+	sql2xlsx()
 	prt_html()
 	http.Handle("/", http.FileServer(http.Dir("./html/")))
 	http.HandleFunc("/gdi", gdi)
