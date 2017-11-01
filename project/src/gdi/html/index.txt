@@ -3,7 +3,7 @@
   
   <head>
     <meta charset="UTF-8" />
-    <title>å¤å‘æ€§æµäº§ç—…ä¾‹å¤§æ•°æ®å½•å…¥ç³»ç»Ÿ</title>
+    <title>¸´·¢ÐÔÁ÷²ú²¡Àý´óÊý¾ÝÂ¼ÈëÏµÍ³</title>
     <style>
 		html { 
 		background-color: #E9EEF0; 
@@ -20,48 +20,48 @@
   </head>
   
   <body>
-	<h1 align="center">å¤å‘æ€§æµäº§ç—…ä¾‹å¤§æ•°æ®å½•å…¥ç³»ç»Ÿ</h1>
-	<h3 align="center"><a href="ffxlc.xlsx">å¯¼å‡ºexcel</a></h3>
+	<h1 align="center">¸´·¢ÐÔÁ÷²ú²¡Àý´óÊý¾ÝÂ¼ÈëÏµÍ³</h1>
+	<h3 align="center"><a href="ffxlc.xlsx">µ¼³öexcel</a></h3>
     <form action="/gdi" method="post">
       <div class="panel">
         <dl>
-          <dt>ç—…äººID</dt>
+          <dt>²¡ÈËID</dt>
           <dd>
             <input type="text" name="BRID" value="" /></dd>
         </dl>
         <dl>
-          <dt>å°±è¯ŠNO</dt>
+          <dt>¾ÍÕïNO</dt>
           <dd>
             <input type="text" name="JZNO" value="" /></dd>
         </dl>
         <dl>
-          <dt>å§“å</dt>
+          <dt>ÐÕÃû</dt>
           <dd>
             <input type="text" name="XM" value="" /></dd>
         </dl>
         <dl>
-          <dt>å¹´é¾„</dt>
+          <dt>ÄêÁä</dt>
           <dd>
             <input type="text" name="NL" value="" /></dd>
         </dl>
         <dl>
-          <dt>æ‰‹æœºå·</dt>
+          <dt>ÊÖ»úºÅ</dt>
           <dd>
             <input type="text" name="SJH" value="" /></dd>
         </dl>
         <dl>
-          <dt>å­¦åŽ†</dt>
+          <dt>Ñ§Àú</dt>
           <dd>
             <input type="text" name="XL" value="" /></dd>
         </dl>
         <dl>
-          <dt>çŽ°ç—…å²</dt>
+          <dt>ÏÖ²¡Ê·</dt>
           <dd>
             <textarea name="XBS" rows="5" cols="60" value=""></textarea>
           </dd>
         </dl>
         <dl>
-          <dt>æ—¢å¾€å²</dt>
+          <dt>¼ÈÍùÊ·</dt>
           <dd>
             <textarea name="JWS" rows="5" cols="60" value=""></textarea>
           </dd>
@@ -69,435 +69,435 @@
       </div>
       <div class="panel">
         <dl>
-          <dt>ç”Ÿè‚²å²-æ€»å…±æ€€å­•</dt>
+          <dt>ÉúÓýÊ·-×Ü¹²»³ÔÐ</dt>
           <dd>
             <input type="text" name="SYS_ZGHY" value="" /></dd>
         </dl>
         <dl>
-          <dt>ç”Ÿè‚²å²-è¶³æœˆäº§</dt>
+          <dt>ÉúÓýÊ·-×ãÔÂ²ú</dt>
           <dd>
             <input type="text" name="SYS_ZYC" value="" /></dd>
         </dl>
         <dl>
-          <dt>ç”Ÿè‚²å²-æ—©äº§</dt>
+          <dt>ÉúÓýÊ·-Ôç²ú</dt>
           <dd>
             <input type="text" name="SYS_ZC" value="" /></dd>
         </dl>
         <dl>
-          <dt>ç”Ÿè‚²å²-äººæµï¼ˆè¯æµï¼‰</dt>
+          <dt>ÉúÓýÊ·-ÈËÁ÷£¨Ò©Á÷£©</dt>
           <dd>
             <input type="text" name="SYS_RL" value="" /></dd>
         </dl>
         <dl>
-          <dt>ç”Ÿè‚²å²-éš¾å…æµäº§ï¼ˆèƒŽåœï¼‰</dt>
+          <dt>ÉúÓýÊ·-ÄÑÃâÁ÷²ú£¨Ì¥Í££©</dt>
           <dd>
             <input type="text" name="SYS_NMLC" value="" /></dd>
         </dl>
         <dl>
-          <dt>ç”Ÿè‚²å²-ç”ŸåŒ–å¦Šå¨ </dt>
+          <dt>ÉúÓýÊ·-Éú»¯ÈÑÉï</dt>
           <dd>
             <input type="text" name="SYS_SHRS" value="" /></dd>
         </dl>
         <dl>
-          <dt>ç”Ÿè‚²å²-å®«å¤–å­•</dt>
+          <dt>ÉúÓýÊ·-¹¬ÍâÔÐ</dt>
           <dd>
             <input type="text" name="SYS_GWY" value="" /></dd>
         </dl>
       </div>
       <div class="panel">
         <dl>
-          <dt>æµäº§å²-æ¬¡æ•°</dt>
+          <dt>Á÷²úÊ·-´ÎÊý</dt>
           <dd>
             <input type="text" name="LCS_CS" value="" /></dd>
         </dl>
         <dl>
-          <dt>æµäº§å²-æµäº§æ—¶é—´</dt>
+          <dt>Á÷²úÊ·-Á÷²úÊ±¼ä</dt>
           <dd>
             <input type="text" name="LCS_LCSJ" value="" /></dd>
         </dl>
         <dl>
-          <dt>æµäº§å²-æ€€å­•å¤©æ•°</dt>
+          <dt>Á÷²úÊ·-»³ÔÐÌìÊý</dt>
           <dd>
             <input type="text" name="LCS_HYTS" value="" /></dd>
         </dl>
         <dl>
-          <dt>æµäº§å²-å­•å›Š</dt>
+          <dt>Á÷²úÊ·-ÔÐÄÒ</dt>
           <dd>
             <input type="text" name="LCS_YN" value="" /></dd>
         </dl>
         <dl>
-          <dt>æµäº§å²-èƒšèŠ½</dt>
+          <dt>Á÷²úÊ·-ÅßÑ¿</dt>
           <dd>
             <input type="text" name="LCS_PY" value="" /></dd>
         </dl>
         <dl>
-          <dt>æµäº§å²-èƒŽå¿ƒ</dt>
+          <dt>Á÷²úÊ·-Ì¥ÐÄ</dt>
           <dd>
             <input type="text" name="LCS_TX" value="" /></dd>
         </dl>
         <dl>
-          <dt>æµäº§å²-è‡ªç„¶æµäº§</dt>
+          <dt>Á÷²úÊ·-×ÔÈ»Á÷²ú</dt>
           <dd>
             <input type="text" name="LCS_ZRLC" value="" /></dd>
         </dl>
         <dl>
-          <dt>æµäº§å²-æ˜¯å¦æ¸…å®«</dt>
+          <dt>Á÷²úÊ·-ÊÇ·ñÇå¹¬</dt>
           <dd>
             <input type="text" name="LCS_SFQG" value="" /></dd>
         </dl>
         <dl>
-          <dt>æµäº§å²-èƒŽå„¿æŸ“è‰²ä½“</dt>
+          <dt>Á÷²úÊ·-Ì¥¶ùÈ¾É«Ìå</dt>
           <dd>
             <input type="text" name="LCS_TERST" value="" /></dd>
         </dl>
       </div>
       <div class="panel">
         <dl>
-          <dt>æœˆç»å²-å‘¨æœŸ</dt>
+          <dt>ÔÂ¾­Ê·-ÖÜÆÚ</dt>
           <dd>
             <input type="text" name="YJS_ZQ" value="" /></dd>
         </dl>
         <dl>
-          <dt>æœˆç»å²-ç—›ç»ï¼ˆÂ±ï¼‰</dt>
+          <dt>ÔÂ¾­Ê·-Í´¾­£¨¡À£©</dt>
           <dd>
             <input type="text" name="YJS_TJ" value="" /></dd>
         </dl>
         <dl>
-          <dt>å¤«å¦»åŒæ–¹æŸ“è‰²ä½“æƒ…å†µ</dt>
+          <dt>·òÆÞË«·½È¾É«ÌåÇé¿ö</dt>
           <dd>
             <input type="text" name="FQSFRSTQK" value="" /></dd>
         </dl>
         <dl>
-          <dt>ç”·æ–¹ç²¾æ¶²å¸¸è§„</dt>
+          <dt>ÄÐ·½¾«Òº³£¹æ</dt>
           <dd>
             <input type="text" name="NFJYCG" value="" /></dd>
         </dl>
         <dl>
-          <dt>æœ¬äººæ…¢æ€§ç–¾ç—…</dt>
+          <dt>±¾ÈËÂýÐÔ¼²²¡</dt>
           <dd>
             <input type="text" name="BRMXJB" value="" /></dd>
         </dl>
         <dl>
-          <dt>çˆ¶æ¯æ…¢æ€§ç–¾ç—…</dt>
+          <dt>¸¸Ä¸ÂýÐÔ¼²²¡</dt>
           <dd>
             <input type="text" name="FMMXJB" value="" /></dd>
         </dl>
         <dl>
-          <dt>ç›®å‰æ˜¯/å¦å·²æ€€å­•</dt>
+          <dt>Ä¿Ç°ÊÇ/·ñÒÑ»³ÔÐ</dt>
           <dd>
             <input type="text" name="MQSFYHY" value="" /></dd>
         </dl>
         <dl>
-          <dt>ç›®å‰æ˜¯/å¦ç”¨è¯</dt>
+          <dt>Ä¿Ç°ÊÇ/·ñÓÃÒ©</dt>
           <dd>
             <input type="text" name="MQSFYY" value="" /></dd>
         </dl>
         <dl>
-          <dt>ç›®å‰ç”¨è¯</dt>
+          <dt>Ä¿Ç°ÓÃÒ©</dt>
           <dd>
             <input type="text" name="MQYY" value="" /></dd>
         </dl>
       </div>
       <div class="panel">
         <dl>
-          <dt>æ£€æŸ¥æ€§æ¿€ç´ -FSH</dt>
+          <dt>¼ì²éÐÔ¼¤ËØ-FSH</dt>
           <dd>
             <input type="text" name="JCXJS_FSH" value="" /></dd>
         </dl>
         <dl>
-          <dt>æ£€æŸ¥æ€§æ¿€ç´ -LH</dt>
+          <dt>¼ì²éÐÔ¼¤ËØ-LH</dt>
           <dd>
             <input type="text" name="JCXJS_LH" value="" /></dd>
         </dl>
         <dl>
-          <dt>æ£€æŸ¥æ€§æ¿€ç´ -E</dt>
+          <dt>¼ì²éÐÔ¼¤ËØ-E</dt>
           <dd>
             <input type="text" name="JCXJS_E" value="" /></dd>
         </dl>
         <dl>
-          <dt>æ£€æŸ¥æ€§æ¿€ç´ -P</dt>
+          <dt>¼ì²éÐÔ¼¤ËØ-P</dt>
           <dd>
             <input type="text" name="JCXJS_P" value="" /></dd>
         </dl>
         <dl>
-          <dt>æ£€æŸ¥æ€§æ¿€ç´ -T</dt>
+          <dt>¼ì²éÐÔ¼¤ËØ-T</dt>
           <dd>
             <input type="text" name="JCXJS_T" value="" /></dd>
         </dl>
         <dl>
-          <dt>æ£€æŸ¥æ€§æ¿€ç´ -PRL</dt>
+          <dt>¼ì²éÐÔ¼¤ËØ-PRL</dt>
           <dd>
             <input type="text" name="JCXJS_PRL" value="" /></dd>
         </dl>
       </div>
       <div class="panel">
         <dl>
-          <dt>èƒ°å²›ç´ -0</dt>
+          <dt>ÒÈµºËØ-0</dt>
           <dd>
             <input type="text" name="YDS_0" value="" /></dd>
         </dl>
         <dl>
-          <dt>èƒ°å²›ç´ -60</dt>
+          <dt>ÒÈµºËØ-60</dt>
           <dd>
             <input type="text" name="YDS_60" value="" /></dd>
         </dl>
         <dl>
-          <dt>èƒ°å²›ç´ -120</dt>
+          <dt>ÒÈµºËØ-120</dt>
           <dd>
             <input type="text" name="YDS_120" value="" /></dd>
         </dl>
         <dl>
-          <dt>èƒ°å²›ç´ -180</dt>
+          <dt>ÒÈµºËØ-180</dt>
           <dd>
             <input type="text" name="YDS_180" value="" /></dd>
         </dl>
         <dl>
-          <dt>è‘¡è„ç³–-0</dt>
+          <dt>ÆÏÌÑÌÇ-0</dt>
           <dd>
             <input type="text" name="PTT_0" value="" /></dd>
         </dl>
         <dl>
-          <dt>è‘¡è„ç³–-60</dt>
+          <dt>ÆÏÌÑÌÇ-60</dt>
           <dd>
             <input type="text" name="PTT_60" value="" /></dd>
         </dl>
         <dl>
-          <dt>è‘¡è„ç³–-120</dt>
+          <dt>ÆÏÌÑÌÇ-120</dt>
           <dd>
             <input type="text" name="PTT_120" value="" /></dd>
         </dl>
         <dl>
-          <dt>è‘¡è„ç³–-180</dt>
+          <dt>ÆÏÌÑÌÇ-180</dt>
           <dd>
             <input type="text" name="PTT_180" value="" /></dd>
         </dl>
       </div>
       <div class="panel">
         <dl>
-          <dt>ç”²çŠ¶è…ºåŠŸèƒ½-æŠ—-TPO</dt>
+          <dt>¼××´ÏÙ¹¦ÄÜ-¿¹-TPO</dt>
           <dd>
             <input type="text" name="JZXGN_K_TPO" value="" /></dd>
         </dl>
         <dl>
-          <dt>ç”²çŠ¶è…ºåŠŸèƒ½-TSH</dt>
+          <dt>¼××´ÏÙ¹¦ÄÜ-TSH</dt>
           <dd>
             <input type="text" name="JZXGN_TSH" value="" /></dd>
         </dl>
         <dl>
-          <dt>ç”²çŠ¶è…ºåŠŸèƒ½-æ¸¸ç¦»T3</dt>
+          <dt>¼××´ÏÙ¹¦ÄÜ-ÓÎÀëT3</dt>
           <dd>
             <input type="text" name="JZXGN_YLT3" value="" /></dd>
         </dl>
         <dl>
-          <dt>ç”²çŠ¶è…ºåŠŸèƒ½-æ¸¸ç¦»T4</dt>
+          <dt>¼××´ÏÙ¹¦ÄÜ-ÓÎÀëT4</dt>
           <dd>
             <input type="text" name="JZXGN_YLT4" value="" /></dd>
         </dl>
         <dl>
-          <dt>ç”²çŠ¶è…ºåŠŸèƒ½-ç”²çŠ¶è…ºçƒè›‹ç™½</dt>
+          <dt>¼××´ÏÙ¹¦ÄÜ-¼××´ÏÙÇòµ°°×</dt>
           <dd>
             <input type="text" name="JZXGN_JZXQDB" value="" /></dd>
         </dl>
         <dl>
-          <dt>ç”²çŠ¶è…ºåŠŸèƒ½-ä¿ƒç”²çŠ¶è…ºç´ å—ä½“æŠ—ä½“</dt>
+          <dt>¼××´ÏÙ¹¦ÄÜ-´Ù¼××´ÏÙËØÊÜÌå¿¹Ìå</dt>
           <dd>
             <input type="text" name="JZXGN_CJZXSSTKT" value="" /></dd>
         </dl>
         <dl>
-          <dt>ç”²çŠ¶è…ºåŠŸèƒ½-æŠ—ç”²çŠ¶è…ºçƒè›‹ç™½æŠ—ä½“</dt>
+          <dt>¼××´ÏÙ¹¦ÄÜ-¿¹¼××´ÏÙÇòµ°°×¿¹Ìå</dt>
           <dd>
             <input type="text" name="JZXGN_KJZXQDBKT" value="" /></dd>
         </dl>
       </div>
       <div class="panel">
         <dl>
-          <dt>ç£·è„‚ç»¼åˆå¾-æŠ—å¿ƒç£·è„‚æŠ—ä½“IgG</dt>
+          <dt>Á×Ö¬×ÛºÏÕ÷-¿¹ÐÄÁ×Ö¬¿¹ÌåIgG</dt>
           <dd>
             <input type="text" name="LZZHZ_KXLZKTIgG" value="" /></dd>
         </dl>
         <dl>
-          <dt>ç£·è„‚ç»¼åˆå¾-æŠ—å¿ƒç£·è„‚æŠ—ä½“IgM</dt>
+          <dt>Á×Ö¬×ÛºÏÕ÷-¿¹ÐÄÁ×Ö¬¿¹ÌåIgM</dt>
           <dd>
             <input type="text" name="LZZHZ_KXLZKTIgM" value="" /></dd>
         </dl>
         <dl>
-          <dt>ç£·è„‚ç»¼åˆå¾-æŠ—Î²2ç³–è›‹ç™½IæŠ—ä½“</dt>
+          <dt>Á×Ö¬×ÛºÏÕ÷-¿¹¦Â2ÌÇµ°°×I¿¹Ìå</dt>
           <dd>
             <input type="text" name="LZZHZ_K2TDBIKT" value="" /></dd>
         </dl>
         <dl>
-          <dt>åŒåž‹åŠèƒ±æ°¨é…¸</dt>
+          <dt>Í¬ÐÍ°ëë×°±Ëá</dt>
           <dd>
             <input type="text" name="TXBZAS" value="" /></dd>
         </dl>
         <dl>
-          <dt>è¡€å°æ¿èšé›†çŽ‡-æœ€å¤§èšé›†çŽ‡(ADP)</dt>
+          <dt>ÑªÐ¡°å¾Û¼¯ÂÊ-×î´ó¾Û¼¯ÂÊ(ADP)</dt>
           <dd>
             <input type="text" name="XXBJJL_ZDJJL_ADP" value="" /></dd>
         </dl>
         <dl>
-          <dt>è¡€å°æ¿èšé›†çŽ‡-æœ€å¤§èšé›†çŽ‡(AA)</dt>
+          <dt>ÑªÐ¡°å¾Û¼¯ÂÊ-×î´ó¾Û¼¯ÂÊ(AA)</dt>
           <dd>
             <input type="text" name="XXBJJL_ZDJJL_AA" value="" /></dd>
         </dl>
         <dl>
-          <dt>D-äºŒèšä½“</dt>
+          <dt>D-¶þ¾ÛÌå</dt>
           <dd>
             <input type="text" name="D_EJT" value="" /></dd>
         </dl>
       </div>
       <div class="panel">
         <dl>
-          <dt>è¡€å¸¸è§„-PT</dt>
+          <dt>Ñª³£¹æ-PT</dt>
           <dd>
             <input type="text" name="XCG_PT" value="" /></dd>
         </dl>
         <dl>
-          <dt>è¡€å¸¸è§„-PT-INR</dt>
+          <dt>Ñª³£¹æ-PT-INR</dt>
           <dd>
             <input type="text" name="XCG_PT_INR" value="" /></dd>
         </dl>
         <dl>
-          <dt>è¡€å¸¸è§„-FIB</dt>
+          <dt>Ñª³£¹æ-FIB</dt>
           <dd>
             <input type="text" name="XCG_FIB" value="" /></dd>
         </dl>
         <dl>
-          <dt>è¡€å¸¸è§„-APTT</dt>
+          <dt>Ñª³£¹æ-APTT</dt>
           <dd>
             <input type="text" name="XCG_APTT" value="" /></dd>
         </dl>
         <dl>
-          <dt>è¡€å¸¸è§„-TT</dt>
+          <dt>Ñª³£¹æ-TT</dt>
           <dd>
             <input type="text" name="XCG_TT" value="" /></dd>
         </dl>
         <dl>
-          <dt>è¡€å¸¸è§„-AT-Ð¨</dt>
+          <dt>Ñª³£¹æ-AT-§º</dt>
           <dd>
             <input type="text" name="XCG_AT" value="" /></dd>
         </dl>
         <dl>
-          <dt>è¡€å¸¸è§„-PC</dt>
+          <dt>Ñª³£¹æ-PC</dt>
           <dd>
             <input type="text" name="XCG_PC" value="" /></dd>
         </dl>
         <dl>
-          <dt>è¡€å¸¸è§„-WBC</dt>
+          <dt>Ñª³£¹æ-WBC</dt>
           <dd>
             <input type="text" name="XCG_WBC" value="" /></dd>
         </dl>
         <dl>
-          <dt>è¡€å¸¸è§„-RBC</dt>
+          <dt>Ñª³£¹æ-RBC</dt>
           <dd>
             <input type="text" name="XCG_RBC" value="" /></dd>
         </dl>
         <dl>
-          <dt>è¡€å¸¸è§„-HGB</dt>
+          <dt>Ñª³£¹æ-HGB</dt>
           <dd>
             <input type="text" name="XCG_HGB" value="" /></dd>
         </dl>
         <dl>
-          <dt>è¡€å¸¸è§„-PLT</dt>
+          <dt>Ñª³£¹æ-PLT</dt>
           <dd>
             <input type="text" name="XCG_PLT" value="" /></dd>
         </dl>
         <dl>
-          <dt>è¡€å¸¸è§„-PCT</dt>
+          <dt>Ñª³£¹æ-PCT</dt>
           <dd>
             <input type="text" name="XCG_PCT" value="" /></dd>
         </dl>
       </div>
       <div class="panel">
         <dl>
-          <dt>ENA-æŠ—æ ¸æŠ—ä½“å®šé‡</dt>
+          <dt>ENA-¿¹ºË¿¹Ìå¶¨Á¿</dt>
           <dd>
             <input type="text" name="ENA_KHKTDL" value="" /></dd>
         </dl>
         <dl>
-          <dt>ENA-æŠ—åŒé“¾DNAå®šé‡</dt>
+          <dt>ENA-¿¹Ë«Á´DNA¶¨Á¿</dt>
           <dd>
             <input type="text" name="ENA_KSLDNADL" value="" /></dd>
         </dl>
         <dl>
-          <dt>ENA-æŠ—SSAæŠ—ä½“å®šé‡</dt>
+          <dt>ENA-¿¹SSA¿¹Ìå¶¨Á¿</dt>
           <dd>
             <input type="text" name="ENA_KSSAKTDL" value="" /></dd>
         </dl>
         <dl>
-          <dt>ENA-æŠ—SSBæŠ—ä½“å®šé‡</dt>
+          <dt>ENA-¿¹SSB¿¹Ìå¶¨Á¿</dt>
           <dd>
             <input type="text" name="ENA_KSSBKTDL" value="" /></dd>
         </dl>
         <dl>
-          <dt>ENA-æŠ—JO-1æŠ—ä½“å®šé‡</dt>
+          <dt>ENA-¿¹JO-1¿¹Ìå¶¨Á¿</dt>
           <dd>
             <input type="text" name="ENA_KJO_1KTDL" value="" /></dd>
         </dl>
         <dl>
-          <dt>ENA-æŠ—SmæŠ—ä½“å®šé‡</dt>
+          <dt>ENA-¿¹Sm¿¹Ìå¶¨Á¿</dt>
           <dd>
             <input type="text" name="ENA_KSmKTDL" value="" /></dd>
         </dl>
         <dl>
-          <dt>ENA-æŠ—nRNPæŠ—ä½“å®šé‡</dt>
+          <dt>ENA-¿¹nRNP¿¹Ìå¶¨Á¿</dt>
           <dd>
             <input type="text" name="ENA_KnRNPKTDL" value="" /></dd>
         </dl>
         <dl>
-          <dt>ENA-æŠ—ScL-70æŠ—ä½“å®šé‡</dt>
+          <dt>ENA-¿¹ScL-70¿¹Ìå¶¨Á¿</dt>
           <dd>
             <input type="text" name="ENA_KScL_70KTDL" value="" /></dd>
         </dl>
         <dl>
-          <dt>ENA-æŠ—ç€ä¸ç‚¹æŠ—ä½“å®šé‡</dt>
+          <dt>ENA-¿¹×ÅË¿µã¿¹Ìå¶¨Á¿</dt>
           <dd>
             <input type="text" name="ENA_KZSDKTDL" value="" /></dd>
         </dl>
         <dl>
-          <dt>ENA-ç»„è›‹ç™½æŠ—ä½“å®šé‡</dt>
+          <dt>ENA-×éµ°°×¿¹Ìå¶¨Á¿</dt>
           <dd>
             <input type="text" name="ENA_ZDBKTDL" value="" /></dd>
         </dl>
       </div>
       <div class="panel">
         <dl>
-          <dt>å­å®«åŠ¨è„‰é˜»åŠ›-å·¦ä¾§PSV</dt>
+          <dt>×Ó¹¬¶¯Âö×èÁ¦-×ó²àPSV</dt>
           <dd>
             <input type="text" name="ZGDMZL_ZCPSV" value="" /></dd>
         </dl>
         <dl>
-          <dt>å­å®«åŠ¨è„‰é˜»åŠ›-å·¦ä¾§EDV</dt>
+          <dt>×Ó¹¬¶¯Âö×èÁ¦-×ó²àEDV</dt>
           <dd>
             <input type="text" name="ZGDMZL_ZCEDV" value="" /></dd>
         </dl>
         <dl>
-          <dt>å­å®«åŠ¨è„‰é˜»åŠ›-å·¦ä¾§S/D</dt>
+          <dt>×Ó¹¬¶¯Âö×èÁ¦-×ó²àS/D</dt>
           <dd>
             <input type="text" name="ZGDMZL_ZCSD" value="" /></dd>
         </dl>
         <dl>
-          <dt>å­å®«åŠ¨è„‰é˜»åŠ›-å·¦ä¾§RI</dt>
+          <dt>×Ó¹¬¶¯Âö×èÁ¦-×ó²àRI</dt>
           <dd>
             <input type="text" name="ZGDMZL_ZCRI" value="" /></dd>
         </dl>
         <dl>
-          <dt>å­å®«åŠ¨è„‰é˜»åŠ›-å³ä¾§PSV</dt>
+          <dt>×Ó¹¬¶¯Âö×èÁ¦-ÓÒ²àPSV</dt>
           <dd>
             <input type="text" name="ZGDMZL_YCPSV" value="" /></dd>
         </dl>
         <dl>
-          <dt>å­å®«åŠ¨è„‰é˜»åŠ›-å³ä¾§EDV</dt>
+          <dt>×Ó¹¬¶¯Âö×èÁ¦-ÓÒ²àEDV</dt>
           <dd>
             <input type="text" name="ZGDMZL_YCEDV" value="" /></dd>
         </dl>
         <dl>
-          <dt>å­å®«åŠ¨è„‰é˜»åŠ›-å³ä¾§S/D</dt>
+          <dt>×Ó¹¬¶¯Âö×èÁ¦-ÓÒ²àS/D</dt>
           <dd>
             <input type="text" name="ZGDMZL_YCSD" value="" /></dd>
         </dl>
         <dl>
-          <dt>å­å®«åŠ¨è„‰é˜»åŠ›-å³ä¾§RI</dt>
+          <dt>×Ó¹¬¶¯Âö×èÁ¦-ÓÒ²àRI</dt>
           <dd>
             <input type="text" name="ZGDMZL_YCRI" value="" /></dd>
         </dl>
@@ -509,59 +509,59 @@
             <input type="text" name="BMI" value="" /></dd>
         </dl>
         <dl>
-          <dt>å¤šæ¯›ï¼ˆÂ±ï¼‰</dt>
+          <dt>¶àÃ«£¨¡À£©</dt>
           <dd>
             <input type="text" name="DM" value="" /></dd>
         </dl>
         <dl>
-          <dt>é»‘æ£˜çš®ï¼ˆÂ±ï¼‰</dt>
+          <dt>ºÚ¼¬Æ¤£¨¡À£©</dt>
           <dd>
             <input type="text" name="HJP" value="" /></dd>
         </dl>
         <dl>
-          <dt>èˆŒè‹”</dt>
+          <dt>ÉàÌ¦</dt>
           <dd>
             <input type="text" name="ST" value="" /></dd>
         </dl>
         <dl>
-          <dt>è„‰è±¡</dt>
+          <dt>ÂöÏó</dt>
           <dd>
             <input type="text" name="MX" value="" /></dd>
         </dl>
         <dl>
-          <dt>ç›®çœ¶é»¯é»‘</dt>
+          <dt>Ä¿¿ô÷öºÚ</dt>
           <dd>
             <input type="text" name="MKZH" value="" /></dd>
         </dl>
         <dl>
-          <dt>é¢è‰²</dt>
+          <dt>ÃæÉ«</dt>
           <dd>
             <input type="text" name="MS" value="" /></dd>
         </dl>
         <dl>
-          <dt>è…°é…¸</dt>
+          <dt>ÑüËá</dt>
           <dd>
             <input type="text" name="YS" value="" /></dd>
         </dl>
         <dl>
-          <dt>ç¥žç–²ä¹åŠ›</dt>
+          <dt>ÉñÆ£·¦Á¦</dt>
           <dd>
             <input type="text" name="SPFL" value="" /></dd>
         </dl>
         <dl>
-          <dt>å¤´æ™•è€³é¸£</dt>
+          <dt>Í·ÔÎ¶úÃù</dt>
           <dd>
             <input type="text" name="TYEM" value="" /></dd>
         </dl>
         <dl>
-          <dt>æœ‰è¡€å—</dt>
+          <dt>ÓÐÑª¿é</dt>
           <dd>
             <input type="text" name="YXK" value="" /></dd>
         </dl>
       </div>
       <div class="panel">
         <div style="text-align:center;">
-          <input type="submit" value="æäº¤"></div>
+          <input type="submit" value="Ìá½»"></div>
       </div>
     </form>
   </body>

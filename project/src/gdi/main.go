@@ -7,9 +7,7 @@ import (
 	"fmt"
 	"net/http"
 	"strings"
-
-	_ "github.com/go-sql-driver/mysql"
-	"github.com/tealeg/xlsx"
+	"tinydb"
 )
 
 var (
@@ -475,27 +473,8 @@ func init() {
 		strDSN = `jhf:jhf@tcp(130.1.10.230:3306)/czzyy`
 	}
 
-	mydb, myerr = sql.Open("mysql", strDSN)
-	if myerr != nil {
-		panic(myerr)
-	}
-
-	mydb.SetMaxOpenConns(3)
-	mydb.SetMaxIdleConns(1)
-
-	myerr = mydb.Ping()
-	if myerr != nil {
-		panic(myerr)
-	}
-
-	ctTable()
-}
-
-func ctTable() {
-	_, err := mydb.Exec(strTabFfxlc)
-	if err != nil {
-		panic(err)
-	}
+	mydb, myerr = tinydb.OpenDb(10, "mysql", strDSN, 3, 1)
+	tinydb.ModifyTab(5, mydb, strTabFfxlc)
 }
 
 func gdi(w http.ResponseWriter, r *http.Request) {
@@ -518,14 +497,13 @@ func gdi(w http.ResponseWriter, r *http.Request) {
 
 	if cnt > 0 {
 		strSql += "(" + strCols + ") values(" + strVals + ")"
-		rst, err := mydb.Exec(strSql)
+		rowCount, _ := tinydb.ModifyTab(30, mydb, strSql)
 
-		if err != nil {
-			strRspHtml = err.Error()
+		if rowCount != 1 {
+			strRspHtml = "error"
 			goto RST
 		}
 
-		rowCount, _ := rst.RowsAffected()
 		if rowCount == 1 {
 			strRspHtml = "添加成功!"
 			goto RST
@@ -533,7 +511,7 @@ func gdi(w http.ResponseWriter, r *http.Request) {
 	}
 
 RST:
-	sql2xlsx()
+	tinydb.SQL2Xlsx(30, mydb, strXlsx, "./html/aa.xlsx")
 	strRspHtml = `<html><body> <div style="text-align:center;"><br><br><br><br><br><br>` + strRspHtml + `<br><a href="/">返回</a></div></body></html>`
 	w.Write([]byte(strRspHtml))
 }
@@ -557,83 +535,15 @@ func prt_html() {
 	}
 }
 
-func addRow2Sheet(s *xlsx.Sheet, args ...string) error {
-	row := s.AddRow()
-	cell := row.AddCell()
-	cell.Value = ""
-
-	for _, v := range args {
-		cell := row.AddCell()
-		cell.Value = v
-	}
-
-	return nil
-}
-
-func sql2xlsx() error {
-	f := xlsx.NewFile()
-	sheet, err := f.AddSheet("Sheet1")
-	if err != nil {
-		return err
-	}
-
-	rows, err := mydb.Query(strXlsx)
-	if err != nil {
-		return err
-	}
-	defer rows.Close()
-
-	columns, err := rows.Columns()
-
-	if err != nil {
-		return err
-	}
-
-	addRow2Sheet(sheet, columns[0:]...)
-
-	values := make([]sql.NullString, len(columns))
-	scans := make([]interface{}, len(columns))
-	cv := make([]string, len(columns))
-
-	for i := range values {
-		scans[i] = &values[i]
-	}
-
-	for rows.Next() {
-		err = rows.Scan(scans...)
-		if err != nil {
-			return err
-		}
-
-		var strVal string
-		for i, col := range values {
-			if !col.Valid {
-				strVal = ""
-			} else {
-				strVal = col.String
-			}
-			cv[i] = strVal
-		}
-
-		addRow2Sheet(sheet, cv[0:]...)
-	}
-
-	if err != nil {
-		return err
-	}
-
-	err = f.Save("./html/ffxlc.xlsx")
-	if err != nil {
-		return err
-	}
-
-	return nil
+func js(w http.ResponseWriter, r *http.Request) {
+	//
 }
 
 func main() {
-	sql2xlsx()
-	prt_html()
+	tinydb.SQL2Xlsx(30, mydb, strXlsx, "./html/aa.xlsx")
+	//prt_html()
 	http.Handle("/", http.FileServer(http.Dir("./html/")))
 	http.HandleFunc("/gdi", gdi)
+	http.HandleFunc("/js", js)
 	fmt.Println(http.ListenAndServe(httpPort, nil))
 }
