@@ -2,6 +2,7 @@
 package main
 
 import (
+	"bytes"
 	"database/sql"
 	"flag"
 	"fmt"
@@ -511,7 +512,7 @@ func gdi(w http.ResponseWriter, r *http.Request) {
 	}
 
 RST:
-	tinydb.SQL2Xlsx(30, mydb, strXlsx, "./html/aa.xlsx")
+	tinydb.SQL2Xlsx(30, mydb, strXlsx, "./html/ffxlc.xlsx")
 	strRspHtml = `<html><body> <div style="text-align:center;"><br><br><br><br><br><br>` + strRspHtml + `<br><a href="/">返回</a></div></body></html>`
 	w.Write([]byte(strRspHtml))
 }
@@ -535,8 +536,13 @@ func prt_html() {
 	}
 }
 
-func js(w http.ResponseWriter, r *http.Request) {
-	//
+func d2js(w http.ResponseWriter, r *http.Request) {
+	var bufdata bytes.Buffer
+	tinydb.SQL2Json(10, mydb, strXlsx, &bufdata)
+	w.Header().Set("Content-Type", "application/json; charset=utf-8")
+	w.Header().Set("Connection", "close")
+	w.Header().Set("CharacterEncoding", "utf-8")
+	w.Write(bufdata.Bytes())
 }
 
 func main() {
@@ -544,6 +550,6 @@ func main() {
 	//prt_html()
 	http.Handle("/", http.FileServer(http.Dir("./html/")))
 	http.HandleFunc("/gdi", gdi)
-	http.HandleFunc("/js", js)
+	http.HandleFunc("/d2js", d2js)
 	fmt.Println(http.ListenAndServe(httpPort, nil))
 }
