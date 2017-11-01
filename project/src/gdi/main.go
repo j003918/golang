@@ -540,7 +540,7 @@ func js(w http.ResponseWriter, r *http.Request) {
 }
 
 func main() {
-	tinydb.SQL2Xlsx(30, mydb, strXlsx, "./html/aa.xlsx")
+	tinydb.SQL2Xlsx(30, mydb, strXlsx, "./html/ffxlc.xlsx")
 	//prt_html()
 	http.Handle("/", http.FileServer(http.Dir("./html/")))
 	http.HandleFunc("/gdi", gdi)
