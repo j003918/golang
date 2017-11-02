@@ -8,6 +8,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"io"
 	"strings"
 	"time"
 
@@ -149,9 +150,9 @@ func _sql2Json(ctx context.Context, mydb *sql.DB, strSql string, out_buf *bytes.
 	return nil
 }
 
-func SQL2Xlsx(timeout time.Duration, mydb *sql.DB, strSql string, strPath string) error {
+func Sql2Xlsx(timeout time.Duration, mydb *sql.DB, strSql string, strPath string, w io.Writer) error {
 	ctx, _ := context.WithTimeout(context.Background(), timeout*time.Second)
-	return _sql2Xlsx(ctx, mydb, strSql, strPath)
+	return _sql2Xlsx(ctx, mydb, strSql, strPath, w)
 }
 
 func addRow2Sheet(s *xlsx.Sheet, args ...string) error {
@@ -167,7 +168,7 @@ func addRow2Sheet(s *xlsx.Sheet, args ...string) error {
 	return nil
 }
 
-func _sql2Xlsx(ctx context.Context, mydb *sql.DB, strSql string, strPath string) error {
+func _sql2Xlsx(ctx context.Context, mydb *sql.DB, strSql string, strPath string, w io.Writer) error {
 	if "" == strings.Trim(strSql, " ") {
 		return errors.New("err msg")
 	}
@@ -223,9 +224,18 @@ func _sql2Xlsx(ctx context.Context, mydb *sql.DB, strSql string, strPath string)
 		return err
 	}
 
-	err = f.Save(strPath)
-	if err != nil {
-		return err
+	if w != nil {
+		err = f.Write(w)
+		if err != nil {
+			fmt.Println(err)
+		}
+	}
+
+	if strPath != "" {
+		err = f.Save(strPath)
+		if err != nil {
+			fmt.Println(err)
+		}
 	}
 
 	select {

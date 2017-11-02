@@ -58,9 +58,9 @@
 		}
 		
 		.wt40{
-			width:60px;
-			min-width:60px;
-			max-width:600px;
+			width:80px;
+			min-width:80px;
+			max-width:80px;
 		}
 		
 		.container{ 
@@ -72,13 +72,13 @@
 <body>
 
 <div id="container">
-<h3 align="center"><a id="rptitle" href="ffxlc.xlsx">复发性流产病例大数据录入系统</a></h3>
+<h3 align="center"><a id="rpt_title" href="#">报表</a></h3>
 	<table border="1px"> 
         <thead>
-          <tr id="tb_cols" >
+          <tr id="rpt_cols" >
           </tr> 
         </thead>
-        <tbody id="tb_rows">
+        <tbody id="rpt_rows">
           <tr>
           </tr>
         </tbody>
@@ -97,20 +97,21 @@ function getQueryString(name) {
     return null;
 }
 
-function loadData(path,title){
-    $('#rptitle').text(title);
+function loadData(rpt,title){
+    $('#rpt_title').text(title);
+	$('#rpt_title').attr("href","exp?rpt="+rpt); 
 	$.getJSON(
-			path,
+			"js?rpt="+rpt,
 			function(json){
-				$('#tb_cols').html('');
+				$('#rpt_cols').html('');
 				$str = '';
 				for(var key in json[0]){  
                   	$str = $str + '<th class="wt40">'+key+'</th>';
 				}
-				$('#tb_cols').append($str);		
+				$('#rpt_cols').append($str);		
 				
 				$str = '';
-				$('#tb_rows').html('');
+				$('#rpt_rows').html('');
 				for(var i=0; i<json.length; i++){
 					$str = $str + '<tr>';
 					row = json[i]
@@ -119,15 +120,15 @@ function loadData(path,title){
                    	}
 					$str = $str + '</tr>';
     			}
-				$('#tb_rows').append($str);
+				$('#rpt_rows').append($str);
 			}
 	);
 }
-var path = getQueryString("id");
+var rpt = getQueryString("rpt");
 var title = getQueryString("title");
-if(path !=null){
+if(rpt !=null){
 	if(title==null){title="报表";}
-	loadData(path,title);
+	loadData(rpt,title);
 }
 </script>
 </html>
