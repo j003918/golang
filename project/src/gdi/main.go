@@ -475,6 +475,10 @@ func init() {
 	}
 
 	mydb, myerr = tinydb.OpenDb(10, "mysql", strDSN, 3, 1)
+	if myerr != nil {
+		fmt.Println(myerr)
+		panic(myerr)
+	}
 	tinydb.ModifyTab(5, mydb, strTabFfxlc)
 }
 
@@ -545,11 +549,21 @@ func d2js(w http.ResponseWriter, r *http.Request) {
 	w.Write(bufdata.Bytes())
 }
 
+func jscn(w http.ResponseWriter, r *http.Request) {
+	var bufdata bytes.Buffer
+	tinydb.SQL2Json(10, mydb, `select column_name,column_comment from information_schema.columns where table_schema ='czzyy' and table_name = 'jhf_ffxlc' and column_comment <> "";`, &bufdata)
+	w.Header().Set("Content-Type", "application/json; charset=utf-8")
+	w.Header().Set("Connection", "close")
+	w.Header().Set("CharacterEncoding", "utf-8")
+	w.Write(bufdata.Bytes())
+}
+
 func main() {
 	tinydb.SQL2Xlsx(30, mydb, strXlsx, "./html/ffxlc.xlsx")
 	//prt_html()
 	http.Handle("/", http.FileServer(http.Dir("./html/")))
 	http.HandleFunc("/gdi", gdi)
 	http.HandleFunc("/d2js", d2js)
+	http.HandleFunc("/jscn", jscn)
 	fmt.Println(http.ListenAndServe(httpPort, nil))
 }
