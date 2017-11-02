@@ -81,7 +81,7 @@
 <body>
 
 <div id="container">
-<h3 align="center"><a href="ffxlc.xlsx">复发性流产病例大数据录入系统</a></h3>
+<h3 align="center"><a id="rptitle" href="ffxlc.xlsx">复发性流产病例大数据录入系统</a></h3>
 	<table border="1px"> 
         <thead>
           <tr id="tb_cols" >
@@ -96,36 +96,47 @@
 	</div>
 </body>
 <script type="text/javascript">
-	function loadData() 
-	{
-    	$.getJSON(
-				 	"/d2js", 
-					function(json)
-					{
-						$('#tb_cols').html('');
-						$str = '';
-						for(var key in json[0])
-						{  
-                  			$str = $str + '<th class="wt40">'+key+'</th>';
-                   		}
-						$('#tb_cols').append($str);
-							
-						$str = '';
-						$('#tb_rows').html('');
-						for(var i=0; i<json.length; i++)
-						{
-							$str = $str + '<tr>';
-							row = json[i]
-							for(var key in row)
-							{  
-								$str = $str + '<td class="wt40">'+row[key]+'</td>';
-                   			} 
-							$str = $str + '</tr>';
-    					}
-						$('#tb_rows').append($str);
-					}
-				);
-	}
-	loadData();
-	</script>
+
+function getQueryString(name) {
+    var reg = new RegExp('(^|&)' + name + '=([^&]*)(&|$)', 'i');
+    var r = window.location.search.substr(1).match(reg);
+    if (r != null) {
+        return unescape(r[2]);
+    }
+    return null;
+}
+
+function loadData(path,title){
+    $('#rptitle').text(title);
+	$.getJSON(
+			path,
+			function(json){
+				$('#tb_cols').html('');
+				$str = '';
+				for(var key in json[0]){  
+                  	$str = $str + '<th class="wt40">'+key+'</th>';
+				}
+				$('#tb_cols').append($str);		
+				
+				$str = '';
+				$('#tb_rows').html('');
+				for(var i=0; i<json.length; i++){
+					$str = $str + '<tr>';
+					row = json[i]
+					for(var key in row){  
+						$str = $str + '<td class="wt40">'+row[key]+'</td>';
+                   	}
+					$str = $str + '</tr>';
+    			}
+				$('#tb_rows').append($str);
+			}
+	);
+}
+var path = getQueryString("id");
+var title = getQueryString("title");
+if(path !=null){
+	if(title==null){title="报表";}
+	loadData(path,title);
+}
+</script>
 </html>
