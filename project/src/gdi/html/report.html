@@ -2,6 +2,7 @@
 <html>
   <head>
     <meta charset="UTF-8" />
+	<title>通用报表</title>
 	<!--
 	目前jQuery有三个大版本：
 	1.x：兼容ie678,使用最为广泛的，官方只做BUG维护，功能不再新增。因此一般项目来说，使用1.x版本就可以了，最终版本：1.12.4 (2016年5月20日)
@@ -24,55 +25,104 @@
 	<script type="text/javascript" src="//cdn.staticfile.org/jquery/3.2.1/jquery.min.js"></script>
 	-->
 	<script type="text/javascript" src="//cdn.staticfile.org/jquery/3.2.1/jquery.min.js"></script>
-	
-    <style>
-		#container { 
-				//width: 98%; 
-				margin: 0 auto; /*设置整个容器在浏览器中水平居中*/ 
-				background:#CCC; 
-			} 
+    <style>	
+		html { 
+			background-color: #E9EFF0; 
+			font-size:14px; 
+		} 
+		a:link { 
+			text-decoration: none; 
+		} 
+		a:visited { 
+			text-decoration: none; 
+		} 
+		a:hover { 
+			text-decoration: none; 
+		} 
+		table {
+        	margin:0 auto; 
+        	border-collapse:collapse;
+			table-layout:fixed;
+		}
+		thead {
+			background:#CCCCCC;
+			display:block;
+		}
+		tbody {
+			height:450px;
+			overflow-y:scroll;
+			display:block;
+		}
+		th{
+			word-wrap:break-word;
+			word-break:break-all;
+		}
+		td {
+			word-wrap:break-word;
+			word-break:break-all;
+		}
+		.wt40{
+			width:60px;
+			min-width:60px;
+			max-width:600px;
+		}
+		.wt50{
+			width:450px;
+			min-width:450px;
+			max-width:450px;
+		}	
+		
+		.container{ 
+		float:left; 
+		margin:0 auto; 
+		} 
 	</style>
   </head>
 <body>
+
 <div id="container">
-<table>
-      <thead>
-      <tr id="infotitle">
-      </tr>
-      </thead>
-      <tbody id="infolist">
-      </tbody>
-   </table>
-</div>
+<h3 align="center"><a href="ffxlc.xlsx">复发性流产病例大数据录入系统</a></h3>
+	<table border="1px"> 
+        <thead>
+          <tr id="tb_cols" >
+          </tr> 
+        </thead>
+        <tbody id="tb_rows">
+          <tr>
+          </tr>
+        </tbody>
+      </table>
+	 
+	</div>
 </body>
 <script type="text/javascript">
 	function loadData() 
 	{
     	$.getJSON(
-				 	"/jscn", 
+				 	"/d2js", 
 					function(json)
 					{
-						$('#infotitle').html('');
+						$('#tb_cols').html('');
 						$str = '';
-						
 						for(var key in json[0])
 						{  
-                  			$str = $str + '<th width=1%> '+key+'  </th>';
+                  			$str = $str + '<th class="wt40">'+key+'</th>';
                    		}
-						$('#infotitle').append($str);
+						$('#tb_cols').append($str);
 							
 						$str = '';
+						$('#tb_rows').html('');
 						for(var i=0; i<json.length; i++)
 						{
 							$str = $str + '<tr>';
 							row = json[i]
 							for(var key in row)
 							{  
-                       			$str = $str + '<td> '+row[key]+'  </td>';
+								$str = $str + '<td class="wt40">'+row[key]+'</td>';
                    			} 
 							$str = $str + '</tr>';
     					}
-						$('#infolist').append($str);
+						$('#tb_rows').append($str);
 					}
 				);
 	}
