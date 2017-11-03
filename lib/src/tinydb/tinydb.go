@@ -2,7 +2,7 @@
 package tinydb
 
 import (
-	"bytes"
+	//	"bytes"
 	"context"
 	"database/sql"
 	"encoding/json"
@@ -74,6 +74,87 @@ func _modifyTab(mydb *sql.DB, strsql string, args ...interface{}) (RowsAffected 
 	return rowCount, true
 }
 
+func Sql2Writer(timeout time.Duration, mydb *sql.DB, strSql string, w io.Writer, dataType string) error {
+	ctx, _ := context.WithTimeout(context.Background(), timeout*time.Second)
+
+	var err error
+	switch strings.ToLower(dataType) {
+	case "xls":
+		fallthrough
+	case "xlsx":
+		err = _xlsx2Writer(ctx, mydb, strSql, w)
+	case "json":
+		fallthrough
+	default:
+		err = _json2Writer(ctx, mydb, strSql, w)
+	}
+	return err
+}
+
+func _json2Writer(ctx context.Context, mydb *sql.DB, strSql string, w io.Writer) error {
+	rows, err := mydb.Query(strSql)
+	if err != nil {
+		return err
+	}
+	defer rows.Close()
+
+	columns, err := rows.Columns()
+	if err != nil {
+		return err
+	}
+
+	//fix bug time.Time nil
+	//values := make([]sql.RawBytes, len(columns))
+	values := make([]sql.NullString, len(columns))
+	scans := make([]interface{}, len(columns))
+
+	for i := range values {
+		scans[i] = &values[i]
+	}
+
+	type Jitem struct {
+		Item string `json:"e"`
+	}
+	var jitem Jitem
+	w.Write([]byte("["))
+	rowCnt := 0
+
+	for rows.Next() {
+		err = rows.Scan(scans...)
+		if err != nil {
+			fmt.Println(err.Error())
+			return err
+		}
+
+		if rowCnt > 0 {
+			w.Write([]byte(","))
+		}
+		rowCnt += 1
+		w.Write([]byte("{"))
+
+		var strVal string
+		for i, col := range values {
+			if !col.Valid {
+				strVal = "null"
+			} else {
+				jitem.Item = col.String
+				bs, _ := json.Marshal(&jitem)
+				strVal = string(bs[6 : len(bs)-2])
+			}
+
+			if i > 0 {
+				w.Write([]byte(","))
+			}
+			w.Write([]byte(fmt.Sprintf(`"%v":"%v"`, columns[i], strVal)))
+		}
+		w.Write([]byte("}"))
+	}
+
+	w.Write([]byte("]"))
+	return nil
+}
+
+/*
 func SQL2Json(timeout time.Duration, mydb *sql.DB, strSql string, out_buf *bytes.Buffer) error {
 	ctx, _ := context.WithTimeout(context.Background(), timeout*time.Second)
 	return _sql2Json(ctx, mydb, strSql, out_buf)
@@ -111,6 +192,7 @@ func _sql2Json(ctx context.Context, mydb *sql.DB, strSql string, out_buf *bytes.
 	var jitem Jitem
 
 	out_buf.WriteByte('[')
+
 	for rows.Next() {
 		err = rows.Scan(scans...)
 		if err != nil {
@@ -119,6 +201,7 @@ func _sql2Json(ctx context.Context, mydb *sql.DB, strSql string, out_buf *bytes.
 		}
 
 		out_buf.WriteByte('{')
+
 		var strVal string
 		for i, col := range values {
 			if !col.Valid {
@@ -150,11 +233,11 @@ func _sql2Json(ctx context.Context, mydb *sql.DB, strSql string, out_buf *bytes.
 	return nil
 }
 
-func Sql2Xlsx(timeout time.Duration, mydb *sql.DB, strSql string, strPath string, w io.Writer) error {
+func Sql2Xlsx(timeout time.Duration, mydb *sql.DB, strSql string, w io.Writer) error {
 	ctx, _ := context.WithTimeout(context.Background(), timeout*time.Second)
-	return _sql2Xlsx(ctx, mydb, strSql, strPath, w)
+	return _sql2Xlsx(ctx, mydb, strSql, w)
 }
-
+*/
 func addRow2Sheet(s *xlsx.Sheet, args ...string) error {
 	row := s.AddRow()
 	cell := row.AddCell()
@@ -168,7 +251,7 @@ func addRow2Sheet(s *xlsx.Sheet, args ...string) error {
 	return nil
 }
 
-func _sql2Xlsx(ctx context.Context, mydb *sql.DB, strSql string, strPath string, w io.Writer) error {
+func _xlsx2Writer(ctx context.Context, mydb *sql.DB, strSql string, w io.Writer) error {
 	if "" == strings.Trim(strSql, " ") {
 		return errors.New("err msg")
 	}
@@ -226,13 +309,6 @@ func _sql2Xlsx(ctx context.Context, mydb *sql.DB, strSql string, strPath string,
 
 	if w != nil {
 		err = f.Write(w)
-		if err != nil {
-			fmt.Println(err)
-		}
-	}
-
-	if strPath != "" {
-		err = f.Save(strPath)
 		if err != nil {
 			fmt.Println(err)
 		}

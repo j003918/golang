@@ -97,11 +97,11 @@ function getQueryString(name) {
     return null;
 }
 
-function loadData(rpt,title){
+function loadData(sn,title){
     $('#rpt_title').text(title);
-	$('#rpt_title').attr("href","exp?rpt="+rpt); 
+	$('#rpt_title').attr("href","dbs?dt=xls&sn="+sn); 
 	$.getJSON(
-			"js?rpt="+rpt,
+			"dbs?sn="+sn,
 			function(json){
 				$('#rpt_cols').html('');
 				$str = '';
@@ -124,11 +124,11 @@ function loadData(rpt,title){
 			}
 	);
 }
-var rpt = getQueryString("rpt");
+var sn = getQueryString("sn");
 var title = getQueryString("title");
-if(rpt !=null){
+if(sn !=null){
 	if(title==null){title="报表";}
-	loadData(rpt,title);
+	loadData(sn,title);
 }
 </script>
 </html>
