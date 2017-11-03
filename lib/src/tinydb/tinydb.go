@@ -2,7 +2,6 @@
 package tinydb
 
 import (
-	//	"bytes"
 	"context"
 	"database/sql"
 	"encoding/json"
@@ -154,90 +153,6 @@ func _json2Writer(ctx context.Context, mydb *sql.DB, strSql string, w io.Writer)
 	return nil
 }
 
-/*
-func SQL2Json(timeout time.Duration, mydb *sql.DB, strSql string, out_buf *bytes.Buffer) error {
-	ctx, _ := context.WithTimeout(context.Background(), timeout*time.Second)
-	return _sql2Json(ctx, mydb, strSql, out_buf)
-}
-
-func _sql2Json(ctx context.Context, mydb *sql.DB, strSql string, out_buf *bytes.Buffer) error {
-	if "" == strings.Trim(strSql, " ") {
-		return errors.New("err msg")
-	}
-
-	rows, err := mydb.Query(strSql)
-	if err != nil {
-		return err
-	}
-	defer rows.Close()
-
-	columns, err := rows.Columns()
-
-	if err != nil {
-		return err
-	}
-
-	//fix bug time.Time nil
-	//values := make([]sql.RawBytes, len(columns))
-	values := make([]sql.NullString, len(columns))
-	scans := make([]interface{}, len(columns))
-
-	for i := range values {
-		scans[i] = &values[i]
-	}
-
-	type Jitem struct {
-		Item string `json:"e"`
-	}
-	var jitem Jitem
-
-	out_buf.WriteByte('[')
-
-	for rows.Next() {
-		err = rows.Scan(scans...)
-		if err != nil {
-			fmt.Println(err.Error())
-			return err
-		}
-
-		out_buf.WriteByte('{')
-
-		var strVal string
-		for i, col := range values {
-			if !col.Valid {
-				strVal = "null"
-			} else {
-				jitem.Item = col.String
-				bs, _ := json.Marshal(&jitem)
-				strVal = string(bs[6 : len(bs)-2])
-			}
-
-			columName := strings.ToLower(columns[i])
-			cell := fmt.Sprintf(`"%v":"%v"`, columName, strVal)
-			out_buf.WriteString(cell + ",")
-		}
-		out_buf.Bytes()[out_buf.Len()-1] = '}'
-		out_buf.WriteByte(',')
-	}
-	if out_buf.Len() > 1 {
-		out_buf.Bytes()[out_buf.Len()-1] = ']'
-	} else {
-		out_buf.WriteByte(']')
-	}
-
-	select {
-	case <-ctx.Done():
-		return ctx.Err()
-	default:
-	}
-	return nil
-}
-
-func Sql2Xlsx(timeout time.Duration, mydb *sql.DB, strSql string, w io.Writer) error {
-	ctx, _ := context.WithTimeout(context.Background(), timeout*time.Second)
-	return _sql2Xlsx(ctx, mydb, strSql, w)
-}
-*/
 func addRow2Sheet(s *xlsx.Sheet, args ...string) error {
 	row := s.AddRow()
 	cell := row.AddCell()
