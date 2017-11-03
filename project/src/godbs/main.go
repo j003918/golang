@@ -70,7 +70,7 @@ func dbs(w http.ResponseWriter, r *http.Request) {
 	case "xls":
 		fallthrough
 	case "xlsx":
-		w.Header().Set("Content-Type", "application/vnd.ms-excel; charset=utf-8") //application/vnd.ms-excel or application/x-xls
+		w.Header().Set("Content-Type", "application/vnd.ms-excel") //application/vnd.ms-excel or application/x-xls
 		w.Header().Set("Content-Disposition", "attachment;filename="+r.FormValue("sn")+".xlsx")
 	default:
 		w.Header().Set("Content-Type", "application/json; charset=utf-8")

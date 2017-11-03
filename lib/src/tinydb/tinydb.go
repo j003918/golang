@@ -172,7 +172,7 @@ func _xlsx2Writer(ctx context.Context, mydb *sql.DB, strSql string, w io.Writer)
 	}
 
 	f := xlsx.NewFile()
-	sheet, err := f.AddSheet("GoSheet1")
+	sheet, err := f.AddSheet("Sheet1")
 	if err != nil {
 		return err
 	}

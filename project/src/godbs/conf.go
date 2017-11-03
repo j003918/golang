@@ -1,4 +1,4 @@
-// sysconfig.go
+// config.go
 package main
 
 import (
