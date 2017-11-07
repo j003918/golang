@@ -229,6 +229,7 @@ func (this *GoDBS) initService() {
 		);`
 
 	this.Exec(30, strSql)
+	this.Exec(30, `insert into godbs (sn,content,name) values('test','select * from information_schema.columns where table_name=''#tn#'' ','测试')`)
 }
 
 func (this *GoDBS) loadService() {

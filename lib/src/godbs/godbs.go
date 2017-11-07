@@ -43,6 +43,7 @@ func (this *GoDBS) InitDBS(db_driver, db_dsn string, db_maxOpen, db_maxIdle int,
 		WriteTimeout:   60 * time.Second,
 		MaxHeaderBytes: 1 << 20,
 	}
+	this.initService()
 
 	return true
 }
@@ -51,7 +52,7 @@ func (this *GoDBS) InitDBS(db_driver, db_dsn string, db_maxOpen, db_maxIdle int,
 func (this *GoDBS) SetDBS(db *sql.DB, srv *http.Server) {
 	this.db = db
 	this.srv = srv
-	this.initConf()
+	this.initService()
 }
 */
 
@@ -66,19 +67,19 @@ func (this *GoDBS) dbs(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	strSql := strSqlObj.(string)
-	/*
-		for k, _ := range r.Form {
-			strSql = strings.Replace(strSql, "<"+k+">", r.Form.Get(k), -1)
-		}
-	*/
+
+	for k, _ := range r.Form {
+		fmt.Println(k)
+		strSql = strings.Replace(strSql, "#"+k+"#", r.Form.Get(k), -1)
+	}
+
+	w.Header().Set("Connection", "close")
 	w.Header().Set("CharacterEncoding", "utf-8")
 
 	var buf bytes.Buffer
 	var err error
 	switch strings.ToLower(strDT) {
-	case "xls":
-		fallthrough
-	case "xlsx":
+	case "xlsx", "xls":
 		err = this.Query2Xlsx(120, &buf, strSql)
 		if err == nil {
 			w.Header().Set("Content-Type", "application/vnd.ms-excel")
@@ -162,10 +163,8 @@ func (this *GoDBS) Run(withTLS bool) {
 		this.mapService.Delete(strSN)
 	})
 
-	this.initService()
-	this.loadService()
-
 	go func() {
+		this.loadService()
 		if withTLS {
 			fmt.Println(this.srv.ListenAndServeTLS("./ca/ca.crt", "./ca/ca.key"))
 		} else {
