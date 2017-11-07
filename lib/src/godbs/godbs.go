@@ -69,7 +69,6 @@ func (this *GoDBS) dbs(w http.ResponseWriter, r *http.Request) {
 	strSql := strSqlObj.(string)
 
 	for k, _ := range r.Form {
-		fmt.Println(k)
 		strSql = strings.Replace(strSql, "#"+k+"#", r.Form.Get(k), -1)
 	}
 

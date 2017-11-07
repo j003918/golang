@@ -3,7 +3,6 @@ package main
 
 import (
 	"flag"
-	"fmt"
 	"godbs"
 	"net/http"
 	"strings"
@@ -455,7 +454,6 @@ func gdi_init() {
 	dbs.Exec(30, "insert into godbs(sn,content,name) values(?,?,?)", "ffxlc", strSqlQuery, "复发性流产")
 
 	if ok {
-		fmt.Println("gdi_init ok true")
 		dbs.Exec(30, "insert into godbs(sn,content,name) values(?,?,?)", "ffxlc", strSqlQuery, "复发性流产")
 		dbs.Exec(30, strSqlInit)
 	}
