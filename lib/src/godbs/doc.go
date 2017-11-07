@@ -3,4 +3,4 @@
 /*
 godbs document
 */
-package main
+package godbs

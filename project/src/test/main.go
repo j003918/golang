@@ -4,9 +4,11 @@ import (
 	"fmt"
 	"freenovel"
 	//	"math/bits"
+	"godbs"
+	"net/http"
 )
 
-func main() {
+func test_freenovel() {
 	nd := freenovel.NewNovelDownloader()
 	novelUrl := ""
 	for {
@@ -14,4 +16,17 @@ func main() {
 		fmt.Scanln(&novelUrl)
 		nd.Start(novelUrl)
 	}
+}
+
+func aa(w http.ResponseWriter, r *http.Request) {
+	w.Write([]byte("method aa"))
+}
+
+func main() {
+	strDsn := `jhf:jhf@tcp(130.1.10.230:3306)/czzyy`
+	dbs := godbs.NewGoDBS()
+	dbs.InitDBS("mysql", strDsn, 3, 1, ":8080")
+
+	dbs.HandleFunc("/aa", aa)
+	dbs.RunHttp()
 }
