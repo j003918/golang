@@ -63,5 +63,5 @@ func main() {
 	dbs = godbs.NewGoDBS()
 	dbs.InitDBS("mysql", strDsn, intMaxOpen, intMaxIdle, srvAddr)
 	dbs.HandleFunc("/gdi", gdi)
-	dbs.RunHttp()
+	dbs.Run(false)
 }

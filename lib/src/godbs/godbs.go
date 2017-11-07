@@ -3,12 +3,14 @@ package godbs
 
 import (
 	"bytes"
+	"compress/gzip"
 	"context"
 	"database/sql"
 	"fmt"
 	"net/http"
 	"os"
 	"os/signal"
+	"strconv"
 	"strings"
 	"sync"
 	"syscall"
@@ -86,6 +88,7 @@ func (this *GoDBS) dbs(w http.ResponseWriter, r *http.Request) {
 		err = this.Query2Json(120, &buf, strSql)
 		if err == nil {
 			w.Header().Set("Content-Type", "application/json; charset=utf-8")
+			w.Header().Set("Cache-Control", "no-cache, no-store, max-age=0")
 		}
 	}
 
@@ -94,7 +97,23 @@ func (this *GoDBS) dbs(w http.ResponseWriter, r *http.Request) {
 		w.Write([]byte(http.StatusText(500)))
 		return
 	}
-	w.Write(buf.Bytes())
+
+	if strings.Contains(r.Header.Get("Accept-Encoding"), "gzip") && buf.Len() >= 1024*50 {
+		var gzbuf bytes.Buffer
+		gz := gzip.NewWriter(&gzbuf)
+		_, err = gz.Write(buf.Bytes())
+		gz.Close()
+		if err == nil {
+			w.Header().Set("Content-Encoding", "gzip")
+			w.Header().Set("Content-Length", strconv.Itoa(gzbuf.Len()))
+			w.Write(gzbuf.Bytes())
+		} else {
+			fmt.Println(err.Error())
+			w.Write(buf.Bytes())
+		}
+	} else {
+		w.Write(buf.Bytes())
+	}
 }
 
 func Handle(pattern string, handler http.Handler) {
@@ -105,7 +124,7 @@ func (this *GoDBS) HandleFunc(pattern string, handler func(http.ResponseWriter, 
 	http.HandleFunc(pattern, handler)
 }
 
-func (this *GoDBS) RunHttp() {
+func (this *GoDBS) Run(withTLS bool) {
 	stopChan := make(chan os.Signal)
 	signal.Notify(stopChan, os.Interrupt, syscall.SIGTERM)
 
@@ -147,7 +166,11 @@ func (this *GoDBS) RunHttp() {
 	this.loadService()
 
 	go func() {
-		fmt.Println(this.srv.ListenAndServe())
+		if withTLS {
+			fmt.Println(this.srv.ListenAndServeTLS("./ca/ca.crt", "./ca/ca.key"))
+		} else {
+			fmt.Println(this.srv.ListenAndServe())
+		}
 	}()
 
 	<-stopChan
