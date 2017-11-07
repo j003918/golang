@@ -499,11 +499,18 @@ RST:
 
 func main() {
 
-	srvAddr := *(flag.String("port", "8080", ""))
-	strDsn := *(flag.String("dsn", "", ""))
-	intMaxOpen := *(flag.Int("maxopen", 3, ""))
-	intMaxIdle := *(flag.Int("maxidle", 1, ""))
+	psrvAddr := flag.String("port", "8080", "")
+	pstrDsn := flag.String("dsn", "", "")
+	pwithTLS := flag.Bool("tls", false, "")
+	pintMaxOpen := flag.Int("maxopen", 3, "")
+	pintMaxIdle := flag.Int("maxidle", 1, "")
 	flag.Parse()
+
+	srvAddr := *psrvAddr
+	strDsn := *pstrDsn
+	withTLS := *pwithTLS
+	intMaxOpen := *pintMaxOpen
+	intMaxIdle := *pintMaxIdle
 
 	srvAddr = ":" + srvAddr
 	if strDsn == "" {
@@ -514,5 +521,5 @@ func main() {
 	dbs.InitDBS("mysql", strDsn, intMaxOpen, intMaxIdle, srvAddr)
 	dbs.HandleFunc("/gdi", gdi)
 	gdi_init()
-	dbs.Run(false)
+	dbs.Run(withTLS)
 }
