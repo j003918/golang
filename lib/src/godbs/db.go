@@ -104,7 +104,6 @@ func (this *GoDBS) Query2Json(timeout time.Duration, buf *bytes.Buffer, query st
 	}
 	var jitem Jitem
 	buf.WriteByte('[')
-	rowCnt := 0
 
 	for rows.Next() {
 		err = rows.Scan(scans...)
@@ -113,26 +112,22 @@ func (this *GoDBS) Query2Json(timeout time.Duration, buf *bytes.Buffer, query st
 			return err
 		}
 
-		if rowCnt > 0 {
-			buf.WriteByte(',')
-		}
-		rowCnt += 1
 		buf.WriteByte('{')
-
-		var strVal string
 		for i, col := range values {
 			jitem.Item = col.String
 			bs, _ := json.Marshal(&jitem)
-			strVal = string(bs[6 : len(bs)-2])
-
-			if i > 0 {
-				buf.WriteByte(',')
-			}
-			buf.WriteString(fmt.Sprintf(`"%v":"%v"`, columns[i], strVal))
+			buf.WriteString(fmt.Sprintf(`"%v":"%v",`, columns[i], string(bs[6:len(bs)-2])))
 		}
-		buf.WriteByte('}')
+
+		buf.Bytes()[buf.Len()-1] = '}'
+		buf.WriteByte(',')
 	}
-	buf.WriteByte(']')
+
+	if buf.Len() > 1 {
+		buf.Bytes()[buf.Len()-1] = ']'
+	} else {
+		buf.WriteByte(']')
+	}
 
 	select {
 	case <-ctx.Done():
