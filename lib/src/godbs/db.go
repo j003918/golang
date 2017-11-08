@@ -121,13 +121,9 @@ func (this *GoDBS) Query2Json(timeout time.Duration, buf *bytes.Buffer, query st
 
 		var strVal string
 		for i, col := range values {
-			if !col.Valid {
-				strVal = "null"
-			} else {
-				jitem.Item = col.String
-				bs, _ := json.Marshal(&jitem)
-				strVal = string(bs[6 : len(bs)-2])
-			}
+			jitem.Item = col.String
+			bs, _ := json.Marshal(&jitem)
+			strVal = string(bs[6 : len(bs)-2])
 
 			if i > 0 {
 				buf.WriteByte(',')
@@ -192,14 +188,8 @@ func (this *GoDBS) Query2Xlsx(timeout time.Duration, buf *bytes.Buffer, query st
 			return err
 		}
 
-		var strVal string
 		for i, col := range values {
-			if !col.Valid {
-				strVal = ""
-			} else {
-				strVal = col.String
-			}
-			cv[i] = strVal
+			cv[i] = col.String
 		}
 		this.addRow2Sheet(sheet, cv[0:]...)
 	}

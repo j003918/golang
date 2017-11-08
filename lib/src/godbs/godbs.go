@@ -39,8 +39,8 @@ func (this *GoDBS) InitDBS(db_driver, db_dsn string, db_maxOpen, db_maxIdle int,
 	this.srv = &http.Server{
 		Addr:           httpAddr,
 		Handler:        http.DefaultServeMux,
-		ReadTimeout:    60 * time.Second,
-		WriteTimeout:   60 * time.Second,
+		ReadTimeout:    120 * time.Second,
+		WriteTimeout:   120 * time.Second,
 		MaxHeaderBytes: 1 << 20,
 	}
 	this.initService()
