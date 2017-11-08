@@ -76,14 +76,14 @@ func (this *GoDBS) Exec(timeout time.Duration, strsql string, args ...interface{
 	return rowCount, true
 }
 
-func (this *GoDBS) Query2Json(timeout time.Duration, buf *bytes.Buffer, query string, args ...interface{}) error {
+func (this *GoDBS) Query2Json(timeout time.Duration, outBuf *bytes.Buffer, query string, args ...interface{}) error {
 	ctx, _ := context.WithTimeout(context.Background(), timeout*time.Second)
 	rows, err := this.db.Query(query, args...)
 	if err != nil {
 		return err
 	}
 	defer rows.Close()
-	buf.Reset()
+	outBuf.Reset()
 
 	columns, err := rows.Columns()
 	if err != nil {
@@ -103,7 +103,7 @@ func (this *GoDBS) Query2Json(timeout time.Duration, buf *bytes.Buffer, query st
 		Item string `json:"e"`
 	}
 	var jitem Jitem
-	buf.WriteByte('[')
+	outBuf.WriteByte('[')
 
 	for rows.Next() {
 		err = rows.Scan(scans...)
@@ -112,21 +112,21 @@ func (this *GoDBS) Query2Json(timeout time.Duration, buf *bytes.Buffer, query st
 			return err
 		}
 
-		buf.WriteByte('{')
+		outBuf.WriteByte('{')
 		for i, col := range values {
 			jitem.Item = col.String
 			bs, _ := json.Marshal(&jitem)
-			buf.WriteString(fmt.Sprintf(`"%v":"%v",`, columns[i], string(bs[6:len(bs)-2])))
+			outBuf.WriteString(fmt.Sprintf(`"%v":"%v",`, columns[i], string(bs[6:len(bs)-2])))
 		}
 
-		buf.Bytes()[buf.Len()-1] = '}'
-		buf.WriteByte(',')
+		outBuf.Bytes()[outBuf.Len()-1] = '}'
+		outBuf.WriteByte(',')
 	}
 
-	if buf.Len() > 1 {
-		buf.Bytes()[buf.Len()-1] = ']'
+	if outBuf.Len() > 1 {
+		outBuf.Bytes()[outBuf.Len()-1] = ']'
 	} else {
-		buf.WriteByte(']')
+		outBuf.WriteByte(']')
 	}
 
 	select {
@@ -148,14 +148,14 @@ func (td *GoDBS) addRow2Sheet(s *xlsx.Sheet, args ...string) {
 	}
 }
 
-func (this *GoDBS) Query2Xlsx(timeout time.Duration, buf *bytes.Buffer, query string, args ...interface{}) error {
+func (this *GoDBS) Query2Xlsx(timeout time.Duration, outBuf *bytes.Buffer, query string, args ...interface{}) error {
 	ctx, _ := context.WithTimeout(context.Background(), timeout*time.Second)
 	rows, err := this.db.Query(query, args...)
 	if err != nil {
 		return err
 	}
 	defer rows.Close()
-	buf.Reset()
+	outBuf.Reset()
 
 	f := xlsx.NewFile()
 	sheet, err := f.AddSheet("Sheet1")
@@ -193,7 +193,7 @@ func (this *GoDBS) Query2Xlsx(timeout time.Duration, buf *bytes.Buffer, query st
 		return err
 	}
 
-	err = f.Write(buf)
+	err = f.Write(outBuf)
 
 	select {
 	case <-ctx.Done():
