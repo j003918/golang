@@ -449,9 +449,9 @@ values
 
 func gdi_init() {
 	_, err := godbs.DBExec(strSqlTab)
-
+	godbs.DBExec("insert into godbs_service(dsn_id,sn,content) values(-1,?,?)", "ffxlc", strSqlQuery)
 	if err == nil {
-		godbs.DBExec("insert into godbs_service(dsn_id,sn,content) values(-1,?,?)", "ffxlc", strSqlQuery)
+
 		godbs.DBExec(strSqlInit)
 	}
 }

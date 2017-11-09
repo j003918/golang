@@ -40,7 +40,6 @@ func (this *dbsManager) initDB(driver, dsn string, maxOpen, maxIdle int) error {
 		return err
 	}
 
-	//this.addDSN(-1, this.sysdb)
 	this.mapDSN.Store(-1, this.sysdb)
 
 	this.sysdb.Exec(sql_godbs_user)
@@ -48,23 +47,8 @@ func (this *dbsManager) initDB(driver, dsn string, maxOpen, maxIdle int) error {
 	this.sysdb.Exec(sql_godbs_service)
 
 	this.sysdb.Exec(sql_godbs_service_test)
-
-	dm.loadDSN()
-	dm.loadService()
 	return nil
 }
-
-/*
-func (this *dbsManager) addDSN(dsnid int, db *sql.DB) {
-	this.mapDSN.Store(dsnid, db)
-	if dsnid == -1 {
-		this.sysdb = db
-	} else {
-
-		fmt.Println("load DSN", dsnid)
-	}
-}
-*/
 
 func (this *dbsManager) delService(sn string) {
 	this.mapServie.Delete(strings.ToLower(sn))
@@ -76,7 +60,7 @@ func (this *dbsManager) addService(sn, strSql string, dsnid int) bool {
 		return false
 	}
 
-	this.mapServie.Store(sn, &dbs{
+	this.mapServie.Store(strings.ToLower(sn), &dbs{
 		sn:   strings.ToLower(sn),
 		sql:  strSql,
 		conn: obj.(*sql.DB),
@@ -102,13 +86,13 @@ func (this *dbsManager) loadDSN() {
 	}
 	defer rows.Close()
 
-	strDriver, strDSN, dsnid, info := "", "", 0, ""
 	for rows.Next() {
+		strDriver, strDSN, dsnid, info := "", "", 0, ""
 		err := rows.Scan(&dsnid, &strDriver, &strDSN, &info)
 		if err != nil {
 			panic(err)
 		}
-
+		fmt.Println("find dsn", info)
 		_, ok := this.mapDSN.Load(dsnid)
 		if ok {
 			continue
@@ -116,7 +100,6 @@ func (this *dbsManager) loadDSN() {
 
 		db, err := dbOpen(strDriver, strDSN, 0, 0)
 		if err == nil {
-			//this.addDSN(dsnid, db)
 			this.mapDSN.Store(dsnid, db)
 			fmt.Println("load DSN", dsnid, info)
 		} else {
@@ -133,13 +116,12 @@ func (this *dbsManager) loadService() {
 	}
 	defer rows.Close()
 
-	strSN, strContent, dsnid := "", "", 0
 	for rows.Next() {
+		strSN, strContent, dsnid := "", "", 0
 		err := rows.Scan(&strSN, &strContent, &dsnid)
 		if err != nil {
 			panic(err)
 		}
-
 		this.addService(strSN, strContent, dsnid)
 	}
 }
@@ -246,6 +228,7 @@ func Run(addr string, withTLS bool) {
 	http.HandleFunc("/dbs", service)
 
 	http.HandleFunc("/dbs/sys/reload", func(w http.ResponseWriter, r *http.Request) {
+		dm.loadDSN()
 		dm.loadService()
 	})
 
@@ -262,6 +245,9 @@ func Run(addr string, withTLS bool) {
 	})
 
 	go func() {
+		dm.loadDSN()
+		dm.loadService()
+
 		if withTLS {
 			fmt.Println(srv.ListenAndServeTLS("./ca/ca.crt", "./ca/ca.key"))
 		} else {
