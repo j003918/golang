@@ -1,0 +1,153 @@
+<!DOCTYPE HTML>
+<html>
+  <head>
+    <meta charset="UTF-8" />
+	<title>通用报表</title>
+	<!--
+	目前jQuery有三个大版本：
+	1.x：兼容ie678,使用最为广泛的，官方只做BUG维护，功能不再新增。因此一般项目来说，使用1.x版本就可以了，最终版本：1.12.4 (2016年5月20日)
+	2.x：不兼容ie678，很少有人使用，官方只做BUG维护，功能不再新增。如果不考虑兼容低版本的浏览器可以使用2.x，最终版本：2.2.4 (2016年5月20日)
+	3.x：不兼容ie678，只支持最新的浏览器。除非特殊要求，一般不会使用3.x版本的，很多老的jQuery插件不支持这个版本。目前该版本是官方主要更新维护的版本。最新版本：3.2.1（2017年3月20日）
+	
+	新浪cdn用的jquery：
+	<script src="//lib.sinaapp.com/js/jquery/1.4.4/jquery.min.js"></script>
+	<script src="//lib.sinaapp.com/js/jquery/1.7.2/jquery.min.js"></script>
+	<script src="//lib.sinaapp.com/js/jquery/1.12.4/jquery-1.12.4.min.js"></script>
+	<script src="//lib.sinaapp.com/js/jquery/2.2.4/jquery-2.2.4.min.js"></script>
+	
+	百度CDN:
+	<script type="text/javascript" src="//apps.bdimg.com/libs/jquery/1.11.3/jquery.min.js"></script>
+	<script type="text/javascript" src="//apps.bdimg.com/libs/jquery/1.7.2/jquery.min.js"></script>
+	
+	官方:
+	<script type="text/javascript" src="//code.jquery.com/jquery-3.2.1.min.js"></script>
+	七牛:
+	<script type="text/javascript" src="//cdn.staticfile.org/jquery/3.2.1/jquery.min.js"></script>
+	-->
+	<script type="text/javascript" src="//cdn.staticfile.org/jquery/3.2.1/jquery.min.js"></script>
+    <style>	
+		html { 
+			background-color: #E9EFF0; 
+			font-size:14px; 
+		} 
+		
+		
+		#container{
+			margin:0 auto;
+			width:98%;
+		}
+		#main{
+			margin:0 auto;
+			overflow:scroll;	
+		}
+		
+		.jstable{
+			height:550px;		
+		}
+		
+		a:link { 
+			text-decoration: none; 
+		} 
+		a:visited { 
+			text-decoration: none; 
+		} 
+		a:hover { 
+			text-decoration: none; 
+		}
+		
+		.jstable table {
+        	margin:0 auto; 
+        	border-collapse:collapse;
+			overflow:scroll;
+			#table-layout:fixed;
+			#word-wrap:break-word;
+			#word-break:break-all;
+		}
+		.jstable table thead {
+			background:#DDD;
+			#display:block;
+		}
+
+	</style>
+  </head>
+<body>
+<div id="container">
+<h3 class="bb" align="center"><a id="rpt_title" href="#">报表</a></h3>
+<div id="main">
+
+<div class="jstable">
+<input type="button" value="添加一行" onclick="addRow()">
+	<table border="1px"> 
+        <thead>
+          <tr id="rpt_cols" >
+		<th >单价</th>
+		<th >数量</th>
+		<th >金额</th>
+          </tr> 
+        </thead>
+        <tbody id="rpt_rows">
+          <tr>
+		<td><input name="" type="text" value=""></td>
+        <td><input name="" type="text" value="1"></td>
+		<td><label value=""></label></td>
+		  </tr>
+        </tbody>
+      </table>
+	<div>
+	</div>
+	</div>
+</body>
+<script type="text/javascript">
+
+function getQueryString(name) {
+    var reg = new RegExp('(^|&)' + name + '=([^&]*)(&|$)', 'i');
+    var r = window.location.search.substr(1).match(reg);
+    if (r != null) {
+        return unescape(r[2]);
+    }
+    return null;
+}
+
+function loadData(sn,title){
+    $('#rpt_title').text(title);
+	$('#rpt_title').attr("href","dbs?dt=xls&sn="+sn); 
+	$.getJSON(
+			"dbs?sn="+sn,
+			function(json){
+				$('#rpt_cols').html('');
+				$str = '';
+				for(var key in json[0]){  
+                  	$str = $str + '<th class="wt40">'+key+'</th>';
+				}
+				$('#rpt_cols').append($str);		
+				
+				$str = '';
+				$('#rpt_rows').html('');
+				for(var i=0; i<json.length; i++){
+					$str = $str + '<tr>';
+					row = json[i]
+					for(var key in row){  
+						$str = $str + '<td class="wt40">'+row[key]+'</td>';
+                   	}
+					$str = $str + '</tr>';
+    			}
+				$('#rpt_rows').append($str);
+			}
+	);
+}
+var sn = getQueryString("sn");
+var title = getQueryString("title");
+if(sn !=null){
+	if(title==null){title="报表";}
+	loadData(sn,title);
+}
+
+function addRow()
+{
+	$str = '<tr>';
+	$str = $str + '<td ><input type="text"></td><td ><input type="text"></td><td ><input type="text"></td>';
+	$str = $str + '</tr>';
+	$('#rpt_rows').append($str);
+}
+</script>
+</html>

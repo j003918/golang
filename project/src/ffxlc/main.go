@@ -9,8 +9,6 @@ import (
 )
 
 var (
-	dbs *godbs.GoDBS
-
 	strSqlTab = `
 	#CREATE TABLE IF NOT EXISTS ffxlc(
 	CREATE TABLE ffxlc(
@@ -450,12 +448,11 @@ values
 )
 
 func gdi_init() {
-	_, ok := dbs.Exec(30, strSqlTab)
-	dbs.Exec(30, "insert into godbs(sn,content,name) values(?,?,?)", "ffxlc", strSqlQuery, "复发性流产")
+	_, err := godbs.DBExec(strSqlTab)
 
-	if ok {
-		dbs.Exec(30, "insert into godbs(sn,content,name) values(?,?,?)", "ffxlc", strSqlQuery, "复发性流产")
-		dbs.Exec(30, strSqlInit)
+	if err == nil {
+		godbs.DBExec("insert into godbs_service(dsn_id,sn,content) values(-1,?,?)", "ffxlc", strSqlQuery)
+		godbs.DBExec(strSqlInit)
 	}
 }
 
@@ -479,7 +476,9 @@ func gdi(w http.ResponseWriter, r *http.Request) {
 
 	if cnt > 0 {
 		strSql += "(" + strCols + ") values(" + strVals + ")"
-		rowCount, _ := dbs.Exec(30, strSql)
+		rst, _ := godbs.DBExec(strSql)
+
+		rowCount, _ := rst.RowsAffected()
 
 		if rowCount != 1 {
 			strRspHtml = "error"
@@ -502,24 +501,19 @@ func main() {
 	psrvAddr := flag.String("port", "8080", "")
 	pstrDsn := flag.String("dsn", "", "")
 	pwithTLS := flag.Bool("tls", false, "")
-	pintMaxOpen := flag.Int("maxopen", 3, "")
-	pintMaxIdle := flag.Int("maxidle", 1, "")
 	flag.Parse()
 
 	srvAddr := *psrvAddr
 	strDsn := *pstrDsn
 	withTLS := *pwithTLS
-	intMaxOpen := *pintMaxOpen
-	intMaxIdle := *pintMaxIdle
 
 	srvAddr = ":" + srvAddr
 	if strDsn == "" {
 		strDsn = `jhf:jhf@tcp(130.1.10.230:3306)/czzyy`
 	}
 
-	dbs = godbs.NewGoDBS()
-	dbs.InitDBS("mysql", strDsn, intMaxOpen, intMaxIdle, srvAddr)
-	dbs.HandleFunc("/gdi", gdi)
+	godbs.InitDBS("mysql", strDsn)
+	godbs.HandleFunc("/gdi", gdi)
 	gdi_init()
-	dbs.Run(withTLS)
+	godbs.Run(srvAddr, withTLS)
 }

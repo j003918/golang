@@ -17,56 +17,161 @@ import (
 	"time"
 )
 
-type GoDBS struct {
-	db         *sql.DB
-	srv        *http.Server
-	mapService sync.Map
+var (
+	dm dbsManager
+)
+
+type dbs struct {
+	sn   string
+	sql  string
+	conn *sql.DB
 }
 
-func NewGoDBS() *GoDBS {
-	return &GoDBS{
-		db:  nil,
-		srv: nil,
-	}
+type dbsManager struct {
+	sysdb     *sql.DB
+	mapDSN    sync.Map
+	mapServie sync.Map
 }
 
-func (this *GoDBS) InitDBS(db_driver, db_dsn string, db_maxOpen, db_maxIdle int, httpAddr string) bool {
-	err := this.opendb(db_driver, db_dsn, db_maxOpen, db_maxIdle)
+func (this *dbsManager) initDB(driver, dsn string, maxOpen, maxIdle int) error {
+	var err error
+	this.sysdb, err = dbOpen(driver, dsn, maxOpen, maxIdle)
 	if err != nil {
-		return false
+		return err
 	}
 
-	this.srv = &http.Server{
-		Addr:           httpAddr,
-		Handler:        http.DefaultServeMux,
-		ReadTimeout:    120 * time.Second,
-		WriteTimeout:   120 * time.Second,
-		MaxHeaderBytes: 1 << 20,
-	}
-	this.initService()
+	//this.addDSN(-1, this.sysdb)
+	this.mapDSN.Store(-1, this.sysdb)
 
-	return true
+	this.sysdb.Exec(sql_godbs_user)
+	this.sysdb.Exec(sql_godbs_dsn)
+	this.sysdb.Exec(sql_godbs_service)
+
+	this.sysdb.Exec(sql_godbs_service_test)
+
+	dm.loadDSN()
+	dm.loadService()
+	return nil
 }
 
 /*
-func (this *GoDBS) SetDBS(db *sql.DB, srv *http.Server) {
-	this.db = db
-	this.srv = srv
-	this.initService()
+func (this *dbsManager) addDSN(dsnid int, db *sql.DB) {
+	this.mapDSN.Store(dsnid, db)
+	if dsnid == -1 {
+		this.sysdb = db
+	} else {
+
+		fmt.Println("load DSN", dsnid)
+	}
 }
 */
 
-func (this *GoDBS) dbs(w http.ResponseWriter, r *http.Request) {
+func (this *dbsManager) delService(sn string) {
+	this.mapServie.Delete(strings.ToLower(sn))
+}
+
+func (this *dbsManager) addService(sn, strSql string, dsnid int) bool {
+	obj, ok := this.mapDSN.Load(dsnid)
+	if !ok {
+		return false
+	}
+
+	this.mapServie.Store(sn, &dbs{
+		sn:   strings.ToLower(sn),
+		sql:  strSql,
+		conn: obj.(*sql.DB),
+	})
+
+	fmt.Println("load service:", sn)
+	return true
+}
+
+func (this *dbsManager) getService(sn string) *dbs {
+	obj, ok := this.mapServie.Load(strings.ToLower(sn))
+	if !ok {
+		return nil
+	}
+	return obj.(*dbs)
+}
+
+func (this *dbsManager) loadDSN() {
+	strsql := "select id,driver,dsn,info from godbs_dsn"
+	rows, err := this.sysdb.Query(strsql)
+	if err != nil {
+		panic(err)
+	}
+	defer rows.Close()
+
+	strDriver, strDSN, dsnid, info := "", "", 0, ""
+	for rows.Next() {
+		err := rows.Scan(&dsnid, &strDriver, &strDSN, &info)
+		if err != nil {
+			panic(err)
+		}
+
+		_, ok := this.mapDSN.Load(dsnid)
+		if ok {
+			continue
+		}
+
+		db, err := dbOpen(strDriver, strDSN, 0, 0)
+		if err == nil {
+			//this.addDSN(dsnid, db)
+			this.mapDSN.Store(dsnid, db)
+			fmt.Println("load DSN", dsnid, info)
+		} else {
+			fmt.Println(err)
+		}
+	}
+}
+
+func (this *dbsManager) loadService() {
+	strsql := "select sn,content,dsn_id from godbs_service"
+	rows, err := this.sysdb.Query(strsql)
+	if err != nil {
+		panic(err)
+	}
+	defer rows.Close()
+
+	strSN, strContent, dsnid := "", "", 0
+	for rows.Next() {
+		err := rows.Scan(&strSN, &strContent, &dsnid)
+		if err != nil {
+			panic(err)
+		}
+
+		this.addService(strSN, strContent, dsnid)
+	}
+}
+
+/******************************************************************************/
+func InitDBS(driver, dsn string) error {
+	return dm.initDB(driver, dsn, 0, 0)
+}
+
+func DBQuery(query string, args ...interface{}) (*sql.Rows, error) {
+	return dm.sysdb.Query(query, args...)
+}
+
+func DBExec(query string, args ...interface{}) (sql.Result, error) {
+	return dm.sysdb.Exec(query, args...)
+}
+
+func service(w http.ResponseWriter, r *http.Request) {
 	r.ParseForm()
 
-	strDT := r.FormValue("dt")
-	strSqlObj, ok := this.mapService.Load(strings.ToLower(r.FormValue("sn")))
-	if !ok {
+	strDT := strings.ToLower(r.FormValue("dt"))
+	strSN := r.FormValue("sn")
+
+	mydbs := dm.getService(strSN)
+	if mydbs == nil {
 		w.WriteHeader(404)
 		w.Write([]byte(http.StatusText(404)))
 		return
 	}
-	strSql := strSqlObj.(string)
+
+	strSql := mydbs.sql
+	db := mydbs.conn
 
 	for k, _ := range r.Form {
 		strSql = strings.Replace(strSql, "#"+k+"#", r.Form.Get(k), -1)
@@ -79,13 +184,13 @@ func (this *GoDBS) dbs(w http.ResponseWriter, r *http.Request) {
 	var err error
 	switch strings.ToLower(strDT) {
 	case "xlsx", "xls":
-		err = this.Query2Xlsx(120, &buf, strSql)
+		err = Query2Xlsx(&buf, db, strSql)
 		if err == nil {
 			w.Header().Set("Content-Type", "application/vnd.ms-excel")
 			w.Header().Set("Content-Disposition", "attachment;filename="+r.FormValue("sn")+".xlsx")
 		}
 	default:
-		err = this.Query2Json(120, &buf, strSql)
+		err = Query2Json(&buf, db, strSql)
 		if err == nil {
 			w.Header().Set("Content-Type", "application/json; charset=utf-8")
 			w.Header().Set("Cache-Control", "no-cache, no-store, max-age=0")
@@ -116,58 +221,51 @@ func (this *GoDBS) dbs(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
+/*
 func Handle(pattern string, handler http.Handler) {
 	http.Handle(pattern, handler)
 }
+*/
 
-func (this *GoDBS) HandleFunc(pattern string, handler func(http.ResponseWriter, *http.Request)) {
+func HandleFunc(pattern string, handler func(http.ResponseWriter, *http.Request)) {
 	http.HandleFunc(pattern, handler)
 }
 
-func (this *GoDBS) Run(withTLS bool) {
+func Run(addr string, withTLS bool) {
 	stopChan := make(chan os.Signal)
 	signal.Notify(stopChan, os.Interrupt, syscall.SIGTERM)
 
+	srv := &http.Server{
+		Addr:           addr,
+		Handler:        http.DefaultServeMux,
+		ReadTimeout:    120 * time.Second,
+		WriteTimeout:   120 * time.Second,
+		MaxHeaderBytes: 1 << 20,
+	}
 	http.Handle("/", http.FileServer(http.Dir("./static/")))
-	http.HandleFunc("/dbs", this.dbs)
+	http.HandleFunc("/dbs", service)
 
 	http.HandleFunc("/dbs/sys/reload", func(w http.ResponseWriter, r *http.Request) {
-		this.loadService()
+		dm.loadService()
 	})
 
 	http.HandleFunc("/dbs/sys/list", func(w http.ResponseWriter, r *http.Request) {
-		this.mapService.Range(func(k, v interface{}) bool {
-			w.Write([]byte(k.(string) + ": " + v.(string) + "\r\n"))
+		dm.mapServie.Range(func(k, v interface{}) bool {
+			w.Write([]byte(k.(string) + ": " + v.(*dbs).sql + "\r\n"))
 			return true
 		})
 	})
 
-	http.HandleFunc("/dbs/sys/add", func(w http.ResponseWriter, r *http.Request) {
-		r.ParseForm()
-		strSN := strings.ToLower(r.FormValue("sn"))
-		strContent := r.FormValue("content")
-		_, ok := this.mapService.LoadOrStore(strSN, strContent)
-
-		if !ok {
-			w.Write([]byte(http.StatusText(200)))
-		} else {
-			w.WriteHeader(500)
-			w.Write([]byte(http.StatusText(500)))
-		}
-	})
-
 	http.HandleFunc("/dbs/sys/del", func(w http.ResponseWriter, r *http.Request) {
 		r.ParseForm()
-		strSN := strings.ToLower(r.FormValue("sn"))
-		this.mapService.Delete(strSN)
+		dm.delService(r.FormValue("sn"))
 	})
 
 	go func() {
-		this.loadService()
 		if withTLS {
-			fmt.Println(this.srv.ListenAndServeTLS("./ca/ca.crt", "./ca/ca.key"))
+			fmt.Println(srv.ListenAndServeTLS("./ca/ca.crt", "./ca/ca.key"))
 		} else {
-			fmt.Println(this.srv.ListenAndServe())
+			fmt.Println(srv.ListenAndServe())
 		}
 	}()
 
@@ -175,7 +273,7 @@ func (this *GoDBS) Run(withTLS bool) {
 	fmt.Println("Shutting down server...")
 
 	ctx, _ := context.WithTimeout(context.Background(), 60*time.Second)
-	this.srv.Shutdown(ctx)
+	srv.Shutdown(ctx)
 
 	if nil != ctx.Err() {
 		fmt.Println(ctx.Err().Error())

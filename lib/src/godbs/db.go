@@ -3,12 +3,9 @@ package godbs
 
 import (
 	"bytes"
-	"context"
 	"database/sql"
 	"encoding/json"
 	"fmt"
-	"strings"
-	"time"
 
 	_ "github.com/go-sql-driver/mysql"
 	"github.com/tealeg/xlsx"
@@ -17,68 +14,64 @@ import (
 	//_ "github.com/mattn/go-sqlite3"
 )
 
-func (this *GoDBS) opendb(driver, dsn string, maxOpen, maxIdle int) error {
-	ctx, _ := context.WithTimeout(context.Background(), 30*time.Second)
+var (
+	sql_godbs_user = `		
+		CREATE TABLE IF NOT EXISTS godbs_user 
+		(
+			id 			VARCHAR(64) PRIMARY KEY NOT NULL,     
+    		pass		VARCHAR(128) NOT NULL, 
+			#sign		VARCHAR(32) NOT NULL DEFAULT "", 
+    		#trustzone 	VARCHAR(512) NOT NULL DEFAULT "*", 
+    		status		INTEGER NOT NULL DEFAULT 0, 
+    		#login_time	DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP, 
+    		create_time	TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
+		);`
 
-	var err error
-	this.db, err = sql.Open(driver, dsn)
+	sql_godbs_dsn = `		
+		CREATE TABLE IF NOT EXISTS godbs_dsn 
+		(
+			id		INTEGER NOT NULL PRIMARY KEY AUTO_INCREMENT,
+    		driver	VARCHAR(64) NOT NULL, 
+    		dsn		VARCHAR(1024) NOT NULL,
+			status 	INTEGER NOT NULL DEFAULT 0,
+			info	VARCHAR(128) NOT NULL DEFAULT "",
+			#update_time	DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP, 
+    		create_time	TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
+		);`
+
+	sql_godbs_service = `		
+		CREATE TABLE IF NOT EXISTS godbs_service 
+		(
+			sn		VARCHAR(128) PRIMARY KEY NOT NULL, 
+    		content		VARCHAR(4096) NOT NULL, 
+    		dsn_id		INTEGER NOT NULL DEFAULT -1,
+			status 		INTEGER NOT NULL DEFAULT 0, 
+    		#update_time	DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP, 
+    		create_time	TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
+		);`
+
+	sql_godbs_service_test = `insert into godbs_service (sn,content) values('test','select now() as server_time')`
+)
+
+func dbOpen(driver, dsn string, maxOpen, maxIdle int) (*sql.DB, error) {
+	db, err := sql.Open(driver, dsn)
 	if err != nil {
-		return err
+		return nil, err
 	}
 
-	this.db.SetMaxOpenConns(maxOpen)
-	this.db.SetMaxIdleConns(maxIdle)
+	db.SetMaxOpenConns(maxOpen)
+	db.SetMaxIdleConns(maxIdle)
 
-	err = this.db.Ping()
+	err = db.Ping()
 	if err != nil {
-		return err
+		return db, err
 	}
 
-	select {
-	case <-ctx.Done():
-		return ctx.Err()
-	default:
-	}
-	return nil
+	return db, err
 }
 
-func (this *GoDBS) Query(timeout time.Duration, query string, args ...interface{}) (*sql.Rows, error) {
-	ctx, _ := context.WithTimeout(context.Background(), timeout*time.Second)
-
-	rows, err := this.db.Query(query, args...)
-	//rows, err := td.mydb.Query(query)
-	select {
-	case <-ctx.Done():
-		return nil, ctx.Err()
-	default:
-	}
-	return rows, err
-}
-
-func (this *GoDBS) Exec(timeout time.Duration, strsql string, args ...interface{}) (RowsAffected int64, ok bool) {
-	ctx, _ := context.WithTimeout(context.Background(), timeout*time.Second)
-
-	rst, err := this.db.Exec(strsql, args...)
-	if err != nil {
-		return 0, false
-	}
-
-	rowCount, err := rst.RowsAffected()
-	if err != nil {
-		return -1, false
-	}
-
-	select {
-	case <-ctx.Done():
-		return -2, false
-	default:
-	}
-	return rowCount, true
-}
-
-func (this *GoDBS) Query2Json(timeout time.Duration, outBuf *bytes.Buffer, query string, args ...interface{}) error {
-	ctx, _ := context.WithTimeout(context.Background(), timeout*time.Second)
-	rows, err := this.db.Query(query, args...)
+func Query2Json(outBuf *bytes.Buffer, db *sql.DB, strSql string, args ...interface{}) error {
+	rows, err := db.Query(strSql, args...)
 	if err != nil {
 		return err
 	}
@@ -129,15 +122,10 @@ func (this *GoDBS) Query2Json(timeout time.Duration, outBuf *bytes.Buffer, query
 		outBuf.WriteByte(']')
 	}
 
-	select {
-	case <-ctx.Done():
-		return ctx.Err()
-	default:
-	}
 	return nil
 }
 
-func (td *GoDBS) addRow2Sheet(s *xlsx.Sheet, args ...string) {
+func addRow2Sheet(s *xlsx.Sheet, args ...string) {
 	row := s.AddRow()
 	cell := row.AddCell()
 	cell.Value = ""
@@ -148,9 +136,8 @@ func (td *GoDBS) addRow2Sheet(s *xlsx.Sheet, args ...string) {
 	}
 }
 
-func (this *GoDBS) Query2Xlsx(timeout time.Duration, outBuf *bytes.Buffer, query string, args ...interface{}) error {
-	ctx, _ := context.WithTimeout(context.Background(), timeout*time.Second)
-	rows, err := this.db.Query(query, args...)
+func Query2Xlsx(outBuf *bytes.Buffer, db *sql.DB, strSql string, args ...interface{}) error {
+	rows, err := db.Query(strSql, args...)
 	if err != nil {
 		return err
 	}
@@ -167,7 +154,7 @@ func (this *GoDBS) Query2Xlsx(timeout time.Duration, outBuf *bytes.Buffer, query
 	if err != nil {
 		return err
 	}
-	this.addRow2Sheet(sheet, columns[0:]...)
+	addRow2Sheet(sheet, columns[0:]...)
 
 	values := make([]sql.NullString, len(columns))
 	scans := make([]interface{}, len(columns))
@@ -186,7 +173,7 @@ func (this *GoDBS) Query2Xlsx(timeout time.Duration, outBuf *bytes.Buffer, query
 		for i, col := range values {
 			cv[i] = col.String
 		}
-		this.addRow2Sheet(sheet, cv[0:]...)
+		addRow2Sheet(sheet, cv[0:]...)
 	}
 
 	if err != nil {
@@ -194,45 +181,5 @@ func (this *GoDBS) Query2Xlsx(timeout time.Duration, outBuf *bytes.Buffer, query
 	}
 
 	err = f.Write(outBuf)
-
-	select {
-	case <-ctx.Done():
-		return ctx.Err()
-	default:
-	}
 	return err
-}
-
-func (this *GoDBS) initService() {
-	strSql := `		
-		CREATE TABLE IF NOT EXISTS godbs 
-		(
-			sn			VARCHAR(64)		PRIMARY KEY NOT NULL,     
-    		content		VARCHAR(4096) 	NOT NULL, 
-			name		VARCHAR(128) 	DEFAULT NULL, 
-    		create_time	TIMESTAMP		NOT NULL DEFAULT CURRENT_TIMESTAMP
-		);`
-
-	this.Exec(30, strSql)
-	this.Exec(30, `insert into godbs (sn,content,name) values('test','select * from information_schema.columns where table_name=''#tn#'' ','测试')`)
-}
-
-func (this *GoDBS) loadService() {
-	strSql := "select sn,content from godbs"
-	rows, err := this.Query(10, strSql)
-	if err != nil {
-		fmt.Println(err)
-		return
-	}
-	defer rows.Close()
-
-	strSN, strContent := "", ""
-	for rows.Next() {
-		err = rows.Scan(&strSN, &strContent)
-		if err != nil {
-			fmt.Println(err.Error())
-			return
-		}
-		this.mapService.Store(strings.ToLower(strSN), strContent)
-	}
 }
