@@ -18,13 +18,13 @@ import (
 )
 
 var (
-	dm dbsManager
+	dm = &dbsManager{}
 )
 
 type dbs struct {
-	sn   string
-	sql  string
-	conn *sql.DB
+	sn     string
+	sql    string
+	dbConn *sql.DB
 }
 
 type dbsManager struct {
@@ -34,19 +34,19 @@ type dbsManager struct {
 }
 
 func (this *dbsManager) initDB(driver, dsn string, maxOpen, maxIdle int) error {
-	var err error
-	this.sysdb, err = dbOpen(driver, dsn, maxOpen, maxIdle)
+	db, err := dbOpen(driver, dsn, maxOpen, maxIdle)
 	if err != nil {
 		return err
 	}
 
-	this.mapDSN.Store(-1, this.sysdb)
+	this.mapDSN.Store(-1, db)
+	this.sysdb = db
 
-	this.sysdb.Exec(sql_godbs_user)
-	this.sysdb.Exec(sql_godbs_dsn)
-	this.sysdb.Exec(sql_godbs_service)
+	db.Exec(sql_godbs_user)
+	db.Exec(sql_godbs_dsn)
+	db.Exec(sql_godbs_service)
 
-	this.sysdb.Exec(sql_godbs_service_test)
+	db.Exec(sql_godbs_service_test)
 	return nil
 }
 
@@ -57,13 +57,14 @@ func (this *dbsManager) delService(sn string) {
 func (this *dbsManager) addService(sn, strSql string, dsnid int) bool {
 	obj, ok := this.mapDSN.Load(dsnid)
 	if !ok {
+		fmt.Println("load", sn, "failure")
 		return false
 	}
 
 	this.mapServie.Store(strings.ToLower(sn), &dbs{
-		sn:   strings.ToLower(sn),
-		sql:  strSql,
-		conn: obj.(*sql.DB),
+		sn:     strings.ToLower(sn),
+		sql:    strSql,
+		dbConn: obj.(*sql.DB),
 	})
 
 	fmt.Println("load service:", sn)
@@ -126,16 +127,26 @@ func (this *dbsManager) loadService() {
 	}
 }
 
-/******************************************************************************/
-func InitDBS(driver, dsn string) error {
-	return dm.initDB(driver, dsn, 0, 0)
+func (this *dbsManager) closeDB() {
+	this.mapDSN.Range(func(k, v interface{}) bool {
+		db := v.(*sql.DB)
+		fmt.Println("close db", k.(int))
+		err := db.Close()
+		if err != nil {
+			fmt.Printf(err.Error())
+		}
+		return true
+	})
 }
 
-func DBQuery(query string, args ...interface{}) (*sql.Rows, error) {
+/******************************************************************************/
+func InitDBS(driver, dsn string) error { return dm.initDB(driver, dsn, 0, 0) }
+
+func Query(query string, args ...interface{}) (*sql.Rows, error) {
 	return dm.sysdb.Query(query, args...)
 }
 
-func DBExec(query string, args ...interface{}) (sql.Result, error) {
+func Exec(query string, args ...interface{}) (sql.Result, error) {
 	return dm.sysdb.Exec(query, args...)
 }
 
@@ -153,7 +164,7 @@ func service(w http.ResponseWriter, r *http.Request) {
 	}
 
 	strSql := mydbs.sql
-	db := mydbs.conn
+	db := mydbs.dbConn
 
 	for k, _ := range r.Form {
 		strSql = strings.Replace(strSql, "#"+k+"#", r.Form.Get(k), -1)
@@ -239,6 +250,24 @@ func Run(addr string, withTLS bool) {
 		})
 	})
 
+	http.HandleFunc("/dbs/sys/add", func(w http.ResponseWriter, r *http.Request) {
+		r.ParseForm()
+		strSN := r.FormValue("sn")
+		strDsnid := r.FormValue("sn")
+		strContent := r.FormValue("content")
+		dsnid, err := strconv.Atoi(strDsnid)
+		if err != nil {
+			w.Write([]byte(err.Error()))
+			return
+		}
+
+		if dm.addService(strSN, strContent, dsnid) {
+			w.Write([]byte("ok"))
+		} else {
+			w.Write([]byte("error"))
+		}
+	})
+
 	http.HandleFunc("/dbs/sys/del", func(w http.ResponseWriter, r *http.Request) {
 		r.ParseForm()
 		dm.delService(r.FormValue("sn"))
@@ -265,5 +294,6 @@ func Run(addr string, withTLS bool) {
 		fmt.Println(ctx.Err().Error())
 	}
 
+	dm.closeDB()
 	fmt.Println("Exit OK!")
 }

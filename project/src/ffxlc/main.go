@@ -448,11 +448,11 @@ values
 )
 
 func gdi_init() {
-	_, err := godbs.DBExec(strSqlTab)
-	godbs.DBExec("insert into godbs_service(dsn_id,sn,content) values(-1,?,?)", "ffxlc", strSqlQuery)
+	_, err := godbs.Exec(strSqlTab)
+	godbs.Exec("insert into godbs_service(dsn_id,sn,content) values(-1,?,?)", "ffxlc", strSqlQuery)
 	if err == nil {
 
-		godbs.DBExec(strSqlInit)
+		godbs.Exec(strSqlInit)
 	}
 }
 
@@ -476,7 +476,7 @@ func gdi(w http.ResponseWriter, r *http.Request) {
 
 	if cnt > 0 {
 		strSql += "(" + strCols + ") values(" + strVals + ")"
-		rst, _ := godbs.DBExec(strSql)
+		rst, _ := godbs.Exec(strSql)
 
 		rowCount, _ := rst.RowsAffected()
 
@@ -497,7 +497,6 @@ RST:
 }
 
 func main() {
-
 	psrvAddr := flag.String("port", "8080", "")
 	pstrDsn := flag.String("dsn", "", "")
 	pwithTLS := flag.Bool("tls", false, "")

@@ -8,11 +8,6 @@ import (
 	"net/http"
 )
 
-type Tunneler interface {
-	In()
-	Out()
-}
-
 func test_freenovel() {
 	nd := freenovel.NewNovelDownloader()
 	novelUrl := ""
