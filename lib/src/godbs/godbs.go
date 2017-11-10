@@ -33,6 +33,17 @@ type dbsManager struct {
 	mapServie sync.Map
 }
 
+func (this *dbsManager) confReload(sec time.Duration) {
+	timerDriver := time.NewTicker(sec * time.Second)
+	for {
+		select {
+		case <-timerDriver.C:
+			this.loadDSN()
+			this.loadService()
+		}
+	}
+}
+
 func (this *dbsManager) initDB(driver, dsn string, maxOpen, maxIdle int) error {
 	db, err := dbOpen(driver, dsn, maxOpen, maxIdle)
 	if err != nil {
@@ -268,7 +279,7 @@ func Run(addr string, withTLS bool) {
 		}
 	})
 
-	http.HandleFunc("/dbs/sys/del", func(w http.ResponseWriter, r *http.Request) {
+	http.HandleFunc("/dbs/sys/remove", func(w http.ResponseWriter, r *http.Request) {
 		r.ParseForm()
 		dm.delService(r.FormValue("sn"))
 	})
