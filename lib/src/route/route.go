@@ -47,7 +47,7 @@ func New() *RouteMux {
 }
 
 // Get adds a new Route for GET requests.
-// i.e Get("/user/{id1}/{id2:([A-Z]+)}", user)
+// Get("/user/{id1}/{id2:([A-Z]+)}", user)
 func (m *RouteMux) Get(pattern string, handler http.HandlerFunc) {
 	m.AddRoute(GET, pattern, handler)
 }
@@ -140,10 +140,6 @@ func (m *RouteMux) Filter(filter http.HandlerFunc) {
 
 // FilterParam adds the middleware filter iff the REST URL parameter exists.
 func (m *RouteMux) FilterParam(param string, filter http.HandlerFunc) {
-	if !strings.HasPrefix(param, ":") {
-		param = ":" + param
-	}
-
 	m.Filter(func(w http.ResponseWriter, r *http.Request) {
 		p := r.URL.Query().Get(param)
 		if len(p) > 0 {
@@ -155,7 +151,6 @@ func (m *RouteMux) FilterParam(param string, filter http.HandlerFunc) {
 // Required by http.Handler interface. This method is invoked by the
 // http server and will handle all page routing
 func (m *RouteMux) ServeHTTP(rw http.ResponseWriter, r *http.Request) {
-
 	requestPath := r.URL.Path
 
 	//wrap the response writer, in our custom interface
