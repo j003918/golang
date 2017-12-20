@@ -2,34 +2,32 @@ package main
 
 import (
 	"fmt"
-	"freenovel"
-	//	"math/bits"
-	"godbs"
 	"net/http"
+	"route"
+	"time"
 )
 
-func test_freenovel() {
-	nd := freenovel.NewNovelDownloader()
-	novelUrl := ""
-	for {
-		fmt.Print("Please input novel url: ")
-		fmt.Scanln(&novelUrl)
-		nd.Start(novelUrl)
-	}
+func user(rw http.ResponseWriter, r *http.Request) {
+	dd1 := r.URL.Query().Get("dts")
+	dd2 := r.URL.Query().Get("dte")
+	rw.Write([]byte(dd1 + ":" + dd2))
 }
 
-func aa(w http.ResponseWriter, r *http.Request) {
-	w.Write([]byte("method aa"))
+func bb(rw http.ResponseWriter, r *http.Request) {
+	rw.Write([]byte("b"))
+}
+
+func logOut(rw http.ResponseWriter, r *http.Request) {
+	fmt.Println(time.Now().Format(time.StampNano), r.Method, r.RequestURI)
 }
 
 func main() {
-	strDsn := `jhf:jhf@tcp(130.1.10.230:3306)/czzyy`
-	//dbs := godbs.GoDBS.InitDBS()
-	//dbs.InitDBS("mysql", strDsn, 3, 1, ":8080")
+	mu := route.New()
 
-	//dbs.HandleFunc("/aa", aa)
-	//dbs.Run(false)
-	//godbs.
-	godbs.InitDBS("mysql", strDsn)
-	godbs.Run(":8080", false)
+	mu.Get("/dbs/{dts}/{dte:([0-9]+)}", user)
+	mu.Get("/st/a/b", bb)
+	mu.Static("/", "./static/")
+	mu.Filter(logOut)
+
+	http.ListenAndServe(":8080", mu)
 }

@@ -33,25 +33,25 @@ type dbsManager struct {
 	mapServie sync.Map
 }
 
-func (this *dbsManager) confReload(sec time.Duration) {
+func (self *dbsManager) confReload(sec time.Duration) {
 	timerDriver := time.NewTicker(sec * time.Second)
 	for {
 		select {
 		case <-timerDriver.C:
-			this.loadDSN()
-			this.loadService()
+			self.loadDSN()
+			self.loadService()
 		}
 	}
 }
 
-func (this *dbsManager) initDB(driver, dsn string, maxOpen, maxIdle int) error {
+func (self *dbsManager) initDB(driver, dsn string, maxOpen, maxIdle int) error {
 	db, err := dbOpen(driver, dsn, maxOpen, maxIdle)
 	if err != nil {
 		return err
 	}
 
-	this.mapDSN.Store(-1, db)
-	this.sysdb = db
+	self.mapDSN.Store(-1, db)
+	self.sysdb = db
 
 	db.Exec(sql_godbs_user)
 	db.Exec(sql_godbs_dsn)
@@ -61,18 +61,18 @@ func (this *dbsManager) initDB(driver, dsn string, maxOpen, maxIdle int) error {
 	return nil
 }
 
-func (this *dbsManager) delService(sn string) {
-	this.mapServie.Delete(strings.ToLower(sn))
+func (self *dbsManager) delService(sn string) {
+	self.mapServie.Delete(strings.ToLower(sn))
 }
 
-func (this *dbsManager) addService(sn, strSql string, dsnid int) bool {
-	obj, ok := this.mapDSN.Load(dsnid)
+func (self *dbsManager) addService(sn, strSql string, dsnid int) bool {
+	obj, ok := self.mapDSN.Load(dsnid)
 	if !ok {
 		fmt.Println("load", sn, "failure")
 		return false
 	}
 
-	this.mapServie.Store(strings.ToLower(sn), &dbs{
+	self.mapServie.Store(strings.ToLower(sn), &dbs{
 		sn:     strings.ToLower(sn),
 		sql:    strSql,
 		dbConn: obj.(*sql.DB),
@@ -82,17 +82,17 @@ func (this *dbsManager) addService(sn, strSql string, dsnid int) bool {
 	return true
 }
 
-func (this *dbsManager) getService(sn string) *dbs {
-	obj, ok := this.mapServie.Load(strings.ToLower(sn))
+func (self *dbsManager) getService(sn string) *dbs {
+	obj, ok := self.mapServie.Load(strings.ToLower(sn))
 	if !ok {
 		return nil
 	}
 	return obj.(*dbs)
 }
 
-func (this *dbsManager) loadDSN() {
+func (self *dbsManager) loadDSN() {
 	strsql := "select id,driver,dsn,info from godbs_dsn"
-	rows, err := this.sysdb.Query(strsql)
+	rows, err := self.sysdb.Query(strsql)
 	if err != nil {
 		panic(err)
 	}
@@ -105,14 +105,13 @@ func (this *dbsManager) loadDSN() {
 			panic(err)
 		}
 		fmt.Println("find dsn", info)
-		_, ok := this.mapDSN.Load(dsnid)
-		if ok {
+
+		if _, ok := self.mapDSN.Load(dsnid); ok {
 			continue
 		}
 
-		db, err := dbOpen(strDriver, strDSN, 0, 0)
-		if err == nil {
-			this.mapDSN.Store(dsnid, db)
+		if db, err := dbOpen(strDriver, strDSN, 0, 0); err == nil {
+			self.mapDSN.Store(dsnid, db)
 			fmt.Println("load DSN", dsnid, info)
 		} else {
 			fmt.Println(err)
@@ -120,9 +119,9 @@ func (this *dbsManager) loadDSN() {
 	}
 }
 
-func (this *dbsManager) loadService() {
+func (self *dbsManager) loadService() {
 	strsql := "select sn,content,dsn_id from godbs_service"
-	rows, err := this.sysdb.Query(strsql)
+	rows, err := self.sysdb.Query(strsql)
 	if err != nil {
 		panic(err)
 	}
@@ -134,12 +133,12 @@ func (this *dbsManager) loadService() {
 		if err != nil {
 			panic(err)
 		}
-		this.addService(strSN, strContent, dsnid)
+		self.addService(strSN, strContent, dsnid)
 	}
 }
 
-func (this *dbsManager) closeDB() {
-	this.mapDSN.Range(func(k, v interface{}) bool {
+func (self *dbsManager) closeDB() {
+	self.mapDSN.Range(func(k, v interface{}) bool {
 		db := v.(*sql.DB)
 		fmt.Println("close db", k.(int))
 		err := db.Close()

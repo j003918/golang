@@ -7,7 +7,12 @@ import (
 )
 
 func init() {
+	http.HandleFunc("/", sayHello)
 	http.HandleFunc("/getip", getip)
+}
+
+func sayHello(w http.ResponseWriter, r *http.Request) {
+	w.Write([]byte("hello world"))
 }
 
 //https://gons3918.appspot.com/

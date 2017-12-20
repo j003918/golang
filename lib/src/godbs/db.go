@@ -76,7 +76,7 @@ func Query2Json(outBuf *bytes.Buffer, db *sql.DB, strSql string, args ...interfa
 		return err
 	}
 	defer rows.Close()
-	//outBuf.Reset()
+	outBuf.Reset()
 
 	columns, err := rows.Columns()
 	if err != nil {
@@ -142,7 +142,7 @@ func Query2Xlsx(outBuf *bytes.Buffer, db *sql.DB, strSql string, args ...interfa
 		return err
 	}
 	defer rows.Close()
-	//outBuf.Reset()
+	outBuf.Reset()
 
 	f := xlsx.NewFile()
 	sheet, err := f.AddSheet("Sheet1")
