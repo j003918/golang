@@ -5,16 +5,10 @@ import (
 	"bytes"
 	"database/sql"
 	"encoding/json"
-	"net/http"
 	"strings"
 
-	"github.com/julienschmidt/httprouter"
 	"github.com/tealeg/xlsx"
 )
-
-func mssqlInfo(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
-
-}
 
 func Rows2Json(rows *sql.Rows, out_buf *bytes.Buffer) error {
 	colKeys, err := rows.Columns()
@@ -35,7 +29,7 @@ func Rows2Json(rows *sql.Rows, out_buf *bytes.Buffer) error {
 	for rows.Next() {
 		err = rows.Scan(colValsPtr...)
 		if err != nil {
-			return nil
+			return err
 		}
 
 		out_buf.WriteByte('{')
@@ -68,7 +62,6 @@ func Rows2Xlsx(rows *sql.Rows, out_buf *bytes.Buffer) error {
 	colVals := make([]sql.NullString, len(colKeys))
 	colValsPtr := make([]interface{}, len(colKeys))
 
-	cells := make([]string, len(colKeys))
 	tmp := xlsx.NewFile()
 	sheet, err := tmp.AddSheet("sheet1")
 	if err != nil {
@@ -81,10 +74,11 @@ func Rows2Xlsx(rows *sql.Rows, out_buf *bytes.Buffer) error {
 	}
 
 	sheet.AddRow().WriteSlice(&colKeys, -1)
+	cells := make([]string, len(colKeys))
 	for rows.Next() {
 		err = rows.Scan(colValsPtr...)
 		if err != nil {
-			return nil
+			return err
 		}
 
 		for i, val := range colVals {
@@ -93,7 +87,7 @@ func Rows2Xlsx(rows *sql.Rows, out_buf *bytes.Buffer) error {
 		sheet.AddRow().WriteSlice(&cells, -1)
 	}
 
-	//tmp.Save("bb.xlsx")
+	//tmp.Save("test.xlsx")
 	tmp.Write(out_buf)
 
 	return nil
