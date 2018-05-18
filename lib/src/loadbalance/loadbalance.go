@@ -61,6 +61,7 @@ func (this *LB) getNode() *node {
 	}
 }
 
+//Proxy work with: http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) { lb.Proxy(w, r) })
 func (this *LB) Proxy(w http.ResponseWriter, r *http.Request) {
 	n := this.getNode()
 	if n == nil {
