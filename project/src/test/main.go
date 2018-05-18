@@ -34,17 +34,13 @@ func oracleTest(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
 	w.Write(buf.Bytes())
 }
 
-func proxy(w http.ResponseWriter, r *http.Request) {
-	lb.Proxy(w, r)
-}
-
 var lb *loadbalance.LB
 
 func main() {
 	lb = loadbalance.NewLB()
 
-	//lbs.Register("http", "130.1.10.230:8080")
-	//lbs.Register("http", "130.1.10.230")
+	lb.Register("http", "130.1.10.230:8080")
+	lb.Register("http", "130.1.10.230")
 
 	//	router := httprouter.New()
 	//	router.GET("/mssql", mssqlTest)
@@ -52,7 +48,6 @@ func main() {
 	//	router.GET("/oracle", oracleTest)
 	//	router.GET("/lb", httpLB)
 	//	fmt.Println(http.ListenAndServe(":8080", router))
-	http.HandleFunc("/", proxy)
+	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) { lb.Proxy(w, r) })
 	fmt.Println(http.ListenAndServe(":8080", nil))
-
 }
