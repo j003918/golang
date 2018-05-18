@@ -4,7 +4,7 @@ package main
 import (
 	"bytes"
 	"fmt"
-	"lb"
+	"loadbalance"
 	"net/http"
 
 	"github.com/julienschmidt/httprouter"
@@ -35,16 +35,16 @@ func oracleTest(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
 }
 
 func proxy(w http.ResponseWriter, r *http.Request) {
-	lbs.Proxy(w, r)
+	lb.Proxy(w, r)
 }
 
-var lbs *lb.LoadBalance
+var lb *loadbalance.LB
 
 func main() {
-	lbs = lb.NewLB()
+	lb = loadbalance.NewLB()
 
-	lbs.Register("http", "130.1.10.230:8080", false)
-	lbs.Register("http", "130.1.10.230", false)
+	//lbs.Register("http", "130.1.10.230:8080")
+	//lbs.Register("http", "130.1.10.230")
 
 	//	router := httprouter.New()
 	//	router.GET("/mssql", mssqlTest)
