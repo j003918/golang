@@ -15,7 +15,7 @@ func mssqlInfo(buf *bytes.Buffer) error {
 	strConn := `sqlserver://sa:www126.com@130.1.10.217:1433?database=rights&encrypt=disable`
 	strSql := `select @@version,GETDATE() as sysdate`
 
-	db, err := sql.Open("mssql", strConn)
+	db, err := sql.Open("sqlserver", strConn)
 	if err != nil {
 		return err
 	}
@@ -61,7 +61,7 @@ func mysqlInfo(buf *bytes.Buffer) error {
 
 func oracleInfo(buf *bytes.Buffer) error {
 	//strConn := `dc/dc@hdc`
-	strConn := `dc/dc@//130.1.10.75:1521/hdc`
+	strConn := `system/manager@//130.1.10.90:1521/orcl`
 	strSql := `select VERSION,sysdate from v$instance`
 
 	db, err := sql.Open("oci8", strConn)
