@@ -1,0 +1,64 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta charset="UTF-8">
+    <title></title>
+    <style type="text/css">
+        table
+        {
+            padding: 0;
+            margin: 0;
+            border-collapse: collapse;
+        }
+        
+        td
+        {
+            border: 1px solid #009999;
+            padding: 6px 6px 6px 12px;
+            color: #4f6b72;
+            text-align: center;
+        }
+        
+        td button
+        {
+            font-size: 12px;
+        }
+    </style>
+	<script src="ajax.js"></script>
+	<script src="table.js"></script>
+
+    <script type="text/javascript">
+        //http://130.1.10.230:8080/dbs?sn=ffxlc&dt=json
+		//var testData = eval("([{\"No\":\"序号\",\"name\":\"姓名\",\"gender\":\"性别\",\"age\":\"年龄\"},{\"No\":\"1\",\"name\":\"小五毛\",\"gender\":\"男\",\"age\":\"22\"},{\"No\":\"2\",\"name\":\"中五毛\",\"gender\":\"女\",\"age\":\"18\"},{\"No\":\"3\",\"name\":\"大五毛\",\"gender\":\"男\",\"age\":\"20\"}])");
+       
+function fn_test(obj, jdate) {
+    createTable("jsontable", eval(jdate), false, false, false);
+}
+
+function fn1(){
+	alert(12)
+}; 
+
+window.onload = function () {
+	//Ajax.get("http://130.1.10.230:8080/dbs?sn=ffxlc&dt=json",fn_test);
+	Ajax.get("/test",fn_test);
+	document.getElementById('btntest').onclick=fn1;
+}	
+	
+    </script>
+</head>
+<body>
+    <div id="jsontable">
+    </div>
+	 <div >
+	<a href="http://130.1.10.230:8080/dbs?sn=ffxlc&dt=xls">xls</a>
+    </div>
+	<a href="http://130.1.10.230:8080/dbs?sn=ffxlc&dt=json">json</a>
+    </div>
+	
+	  <div id="btntest">
+	dsdsd
+    </div>
+	
+</body>
+</html>

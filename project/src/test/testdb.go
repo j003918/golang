@@ -8,7 +8,7 @@ import (
 
 	_ "github.com/denisenkom/go-mssqldb"
 	_ "github.com/go-sql-driver/mysql"
-	_ "github.com/mattn/go-oci8"
+	//_ "github.com/mattn/go-oci8"
 )
 
 func mssqlInfo(buf *bytes.Buffer) error {
@@ -62,7 +62,8 @@ func mysqlInfo(buf *bytes.Buffer) error {
 func oracleInfo(buf *bytes.Buffer) error {
 	//strConn := `dc/dc@hdc`
 	strConn := `system/manager@//130.1.10.90:1521/orcl`
-	strSql := `select VERSION,sysdate from v$instance`
+	//strSql := `select VERSION,sysdate from v$instance`
+	strSql := `select USER_NAME,HRP_USER_NAME,NAME,JOB,CREATE_DATE from staff_dict order by USER_NAME`
 
 	db, err := sql.Open("oci8", strConn)
 	if err != nil {
