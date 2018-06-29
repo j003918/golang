@@ -5,15 +5,17 @@ import (
 	"bytes"
 	"database/sql"
 	"encoding/json"
+	"log"
 	"strings"
 
 	"github.com/tealeg/xlsx"
 )
 
-func Rows2Json(rows *sql.Rows, out_buf *bytes.Buffer) error {
+func Rows2Json(rows *sql.Rows, out_buf *bytes.Buffer) bool {
 	colKeys, err := rows.Columns()
 	if err != nil {
-		return err
+		log.Println(err)
+		return false
 	}
 
 	colVals := make([]sql.NullString, len(colKeys))
@@ -29,14 +31,16 @@ func Rows2Json(rows *sql.Rows, out_buf *bytes.Buffer) error {
 	for rows.Next() {
 		err = rows.Scan(colValsPtr...)
 		if err != nil {
-			return err
+			log.Println(err)
+			return false
 		}
 
 		out_buf.WriteByte('{')
 		for i, val := range colVals {
 			valBuf, err = json.Marshal(&val.String)
 			if err != nil {
-				return err
+				log.Println(err)
+				return false
 			}
 			out_buf.WriteString(`"` + colKeys[i] + `":` + string(valBuf) + `,`)
 		}
@@ -50,13 +54,14 @@ func Rows2Json(rows *sql.Rows, out_buf *bytes.Buffer) error {
 		out_buf.WriteByte(']')
 	}
 
-	return nil
+	return true
 }
 
-func Rows2Xlsx(rows *sql.Rows, out_buf *bytes.Buffer) error {
+func Rows2Xlsx(rows *sql.Rows, out_buf *bytes.Buffer) bool {
 	colKeys, err := rows.Columns()
 	if err != nil {
-		return err
+		log.Println(err)
+		return false
 	}
 
 	colVals := make([]sql.NullString, len(colKeys))
@@ -65,7 +70,8 @@ func Rows2Xlsx(rows *sql.Rows, out_buf *bytes.Buffer) error {
 	tmp := xlsx.NewFile()
 	sheet, err := tmp.AddSheet("sheet1")
 	if err != nil {
-		return err
+		log.Println(err)
+		return false
 	}
 
 	for i, _ := range colKeys {
@@ -78,7 +84,8 @@ func Rows2Xlsx(rows *sql.Rows, out_buf *bytes.Buffer) error {
 	for rows.Next() {
 		err = rows.Scan(colValsPtr...)
 		if err != nil {
-			return err
+			log.Println(err)
+			return false
 		}
 
 		for i, val := range colVals {
@@ -90,5 +97,5 @@ func Rows2Xlsx(rows *sql.Rows, out_buf *bytes.Buffer) error {
 	//tmp.Save("test.xlsx")
 	tmp.Write(out_buf)
 
-	return nil
+	return true
 }

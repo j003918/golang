@@ -19,6 +19,7 @@ type HIS struct {
 func NewHIS() *HIS {
 	strDSN := `system/manager@//130.1.10.90:1521/orcl`
 	db, err := sql.Open("oci8", strDSN)
+	db.Ping()
 	if err != nil {
 		return nil
 	}

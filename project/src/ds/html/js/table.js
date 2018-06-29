@@ -1,13 +1,15 @@
 /*
-        createTable(toid, jsondata, check, edit, del)：用于动态创建table
-        @toid：创建table到id为toid的节点下
+        createTable(pid,oid, jsondata, check, edit, del)：用于动态创建table
+        @pid：新创建table到id为pid的节点下
+		@oid：新创建tabler的id
         @jsondata：用于创建table的json格式的数据（key含表头标题）
         @check：是否创建查看按钮
         @edit：是否创建编辑按钮
         @del：是否创建删除按钮
 */
-function createTable(toid, jsondata, check, edit, del) {
+function createTable(pid, oid, jsondata, check, edit, del) {
     var table = document.createElement("table");
+	table.id = oid;
     var trh, trc, td;
 
     for (i in jsondata) {
@@ -70,5 +72,5 @@ function createTable(toid, jsondata, check, edit, del) {
         }
         table.appendChild(trc);
     }
-    document.getElementById(toid).appendChild(table);
+    document.getElementById(pid).appendChild(table);
 }
