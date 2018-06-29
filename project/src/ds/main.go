@@ -20,7 +20,7 @@ var his *HIS
 func main() {
 	his = NewHIS()
 	router := httprouter.New()
-	router.ServeFiles("/web/*filepath", http.Dir("html"))
+	router.ServeFiles("/web/*filepath", http.Dir("web"))
 
 	router.GET("/test", do)
 	log.Println(http.ListenAndServe(":8080", router))

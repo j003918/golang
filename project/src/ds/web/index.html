@@ -1,0 +1,57 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta charset="UTF-8">
+    <title></title>
+
+	
+	<link rel="stylesheet" type="text/css" href="css/main.css" />
+	<link rel="stylesheet" type="text/css" href="css/table.css" />
+	<script type="text/javascript" src="js/ajax.js"></script>
+	<script type="text/javascript" src="js/table.js"></script>
+
+    <script type="text/javascript">
+	function fn_test(obj, jdate) {
+    	createTable("jsontable",'_jt', eval(jdate), false, false, false);
+	}
+
+	function fn1(){
+		var jt =  document.getElementById('_jt');
+		if (jt != null){
+			document.getElementById('jsontable').removeChild(jt);
+		}
+		Ajax.get("/test",fn_test);
+	}; 
+
+	window.onload = function () {
+		document.getElementById('btntest').onclick=fn1;
+	}	
+	
+    </script>
+</head>
+<body>
+<!--   
+<div>
+	开始时间:<input id="d_st" type="date"/>结束时间:<input id="d_et" type="date"/>  <label id="btntest">查询</label>
+</div>
+<div id="jsontable"></div>
+-->	
+<div id="wrap">  
+        <div id="header">header</div>  
+        <div id="container">  
+            <div id="left_side">left_side</div>  
+			<div id="content_test_bar">
+			开始时间:<input id="d_st" type="date"/>结束时间:<input id="d_et" type="date"/>  <label id="btntest">查询</label>
+			</div>  
+            <div id="content_test"><div id="jsontable"></div></div>  
+			<!--
+            <div id="right_side">right-side</div>  
+			-->
+        </div>  
+		<!--
+        <div id="footer">footer</div>  
+		-->
+    </div>  
+	
+</body>
+</html>
