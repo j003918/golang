@@ -103,6 +103,6 @@ func (sm *SessionMgr) NewSessino() *Session {
 	return si
 }
 
-func (sm *SessionMgr) Del(sid int64) {
-	sm.sessionMap.Delete(sid)
+func (sm *SessionMgr) Del(k interface{}) {
+	sm.sessionMap.Delete(k)
 }

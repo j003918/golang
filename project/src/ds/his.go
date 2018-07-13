@@ -73,19 +73,6 @@ func (h *HIS) docotors(buf *bytes.Buffer) bool {
 	return dbs.Rows2Json(rows, buf)
 }
 
-/*
-func (h *HIS) diagnosis(buf *bytes.Buffer) bool {
-	strSql := `select DIAGNOSIS_CODE as diagcode,DIAGNOSIS_NAME as diagname from COMM.DIAGNOSIS_DICT order by DIAGNOSIS_NAME`
-	rows, err := h.conn.Query(strSql)
-	if err != nil {
-		log.Println(err)
-		return false
-	}
-	defer rows.Close()
-
-	return dbs.Rows2Json(rows, buf)
-}
-*/
 func (h *HIS) diagnosis(buf *bytes.Buffer, key string) bool {
 	strSql := `select DIAGNOSIS_CODE as diagcode,DIAGNOSIS_NAME as diagname from COMM.DIAGNOSIS_DICT where DIAGNOSIS_NAME like '%` + key + `%' order by DIAGNOSIS_NAME`
 	rows, err := h.conn.Query(strSql)

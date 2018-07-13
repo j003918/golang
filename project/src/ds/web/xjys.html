@@ -2,62 +2,61 @@
 <html>
   <head>
     <meta charset="UTF-8" />
-	<script type="text/javascript" src="js/ajax.js"></script>
-	<script type="text/javascript">	
+	<script type="text/javascript" src="http://lib.sinaapp.com/js/jquery/1.9.1/jquery-1.9.1.min.js"></script>
+<script type="text/javascript">$(function() {
+    $(document).ready(function() {
+      $("#frmMain").attr("action", "/tf" + window.location.search);
+      $('#txt_diag').on('input propertychange',
+      function() {
+        $.ajax({
+          type: "GET",
+          url: "/his/diag/" + $("#txt_diag").val(),
+          data: window.location.search.substr(1),
+          success: function(data) {
+            $("#diagnosis").empty();
+            //var option = $("<option>").val(1).text("pxx"); 
+            $("#diagnosis").append($("<option>").val("-1").text("请选择"));
+            $.each(data,
+            function(idx, obj) {
+              $("#diagnosis").append($("<option>").val(obj.diagcode).text(obj.diagname));
+            });
+          }
+        });
+      });
+    });
+
+    $("#btnquery").click(function() {
+      $.ajax({
+        type: "GET",
+        url: "/his/pid/" + $("#pid").val(),
+        data: window.location.search.substr(1),
+        success: function(data) {　　　　$("#txt_name").attr("value", data.name);
+          $("#txt_sex").attr("value", data.sex);
+          $("#txt_tel").attr("value", data.tel);
+          $("#txt_age").attr("value", data.age);
+        }
+      });
+
+      $.ajax({
+        type: "GET",
+        url: "/his/doctor",
+        data: window.location.search.substr(1),
+        success: function(data) {
+          $("#order_doctor").empty();
+          //var option = $("<option>").val(1).text("pxx"); 
+          $("#order_doctor").append($("<option>").val("-1").text("请选择"));
+          $.each(data,
+          function(idx, obj) {
+            $("#order_doctor").append($("<option>").val(obj.username).text(obj.realname));
+          });
+        }
+      });
+
+    });
+  });
+</script>
 	
-	function get_patient_info(obj, jdate){
-		var obj = eval('(' + jdate + ')');
-		document.getElementById('txt_name').value = obj.name;
-		document.getElementById('txt_sex').value = obj.sex;
-		document.getElementById('txt_tel').value = obj.tel;
-		document.getElementById('txt_age').value = obj.age;
-	}
 	
-	function get_doctor(obj, jdate){
-		var jsonobj = eval('(' + jdate + ')');
-		lst_doctor = document.getElementById('order_doctor');
-		lst_doctor.options.length = 0;     
-        lst_doctor.options.add(new Option("请选择", "-1"));  
-		
-		for(var i in jsonobj){
-			lst_doctor.options.add(new Option(jsonobj[i].realname, jsonobj[i].username));  
-    	} 
-	}
-	
-	function get_diags(obj, jdate){
-		var jsonobj = eval('(' + jdate + ')');
-		lst_doctor = document.getElementById('diagnosis');
-		lst_doctor.options.length = 0;     
-        lst_doctor.options.add(new Option("请选择", "-1"));
-		
-		for(var i in jsonobj){
-			lst_doctor.options.add(new Option(jsonobj[i].diagname, jsonobj[i].diagcode));  
-    	} 
-	}
-	
-	function buildReqUrl(path){
-		var url = document.location.toString();
-　　　　	var arrUrl = url.split("?");
-		if (arrUrl.length <= 1){
-			return path
-		}
-		return path+"?"+arrUrl[1]
-	}
-	
-	function checkField(value){
-		Ajax.get(buildReqUrl("/his/diag/"+value),get_diags);
-	}
-	
-	function query_pid(){
-		strUrl =  buildReqUrl("/his/pid/"+document.getElementById('pid').value)// "/his/pid/"+document.getElementById('pid').value+"?"+arrUrl[1];
-		Ajax.get(strUrl,get_patient_info);
-		Ajax.get( buildReqUrl("/his/doctor"),get_doctor);
-	}
-	window.onload = function () {
-		document.getElementById('btnquery').onclick=query_pid;
-		document.getElementById('frmMain').action=buildReqUrl("/tf");
-	}	
-    </script>
     <title>常州市中医医院夏季养生贴敷登记记录</title>
     <style>
 		html { 
@@ -90,15 +89,15 @@
     <form id="frmMain" action="/tf" method="post">
 	<div class="panel">
 	ID:&nbsp;&nbsp;<input type="text" name="pid" id="pid" value="" />
-	<input type="button" name="btnquery" id="btnquery" value="查询">
+	<input type="button" id="btnquery" name="btnquery" value="查询">
 	</div>
 
 	<div class="panel">
-	主要诊断:&nbsp;&nbsp;<input type="text"  value="" onchange="checkField(this.value)" /><select name = "diagnosis" id="diagnosis" >
+	主要诊断:&nbsp;&nbsp;<input type="text" id="txt_diag" value="" /><select name = "diagnosis" id="diagnosis" >
 	<option value ="-1" selected>请选择</option>
 	</select>
 	开单医生:&nbsp;&nbsp;<select name = "order_doctor" id="order_doctor"><option value ="-1" selected>请选择</option></select>
-	贴敷年限:&nbsp;&nbsp;<select name = "year" id="year">
+	贴敷年限:&nbsp;&nbsp;<select name = "cure_period" id="cure_period">
 		<option value ="-1" selected>请选择</option>
 		<option value ="1">第1年</option>
   		<option value ="2">第2年</option>
@@ -166,7 +165,7 @@
   		<option value ="6">出现全身过敏性反应</option>
   		<option value ="7">其它</option>
 	</select>
-	特殊处理:&nbsp;&nbsp;<select name = "lst_deal" id="lst_deal">
+	特殊处理:&nbsp;&nbsp;<select name = "dispose" id="dispose">
 		<option value ="-1" selected>请选择</option>
 		<option value ="1">暂停贴敷</option>
   		<option value ="2">局部换药处理</option>
