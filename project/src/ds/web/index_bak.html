@@ -1,0 +1,83 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta charset="UTF-8">
+    <title></title>
+
+	
+	<link rel="stylesheet" type="text/css" href="css/main.css" />
+	<link rel="stylesheet" type="text/css" href="css/table.css" />
+	<script type="text/javascript" src="js/ajax.js"></script>
+	<script type="text/javascript" src="js/table.js"></script>
+
+    <script type="text/javascript">
+	function json2table(obj, jdate) {
+    	createTable("jsontable",'_jt', eval(jdate), false, false, false);
+	}
+	
+	function json2excel(obj, jdate) {
+    	//createTable("jsontable",'_jt', eval(jdate), false, false, false);
+	}
+
+	function fn_table(){
+		var jt =  document.getElementById('_jt');
+		if (jt != null){
+			document.getElementById('jsontable').removeChild(jt);
+		}
+		
+		var st = document.getElementById('d_st').value;
+		var et = document.getElementById('d_et').value;
+		
+		
+		var url = "/test/json/"+st+"/"+et
+		Ajax.get(url,json2table);
+	}; 
+	
+		function fn_excle(){
+		var jt =  document.getElementById('_jt');
+		if (jt != null){
+			document.getElementById('jsontable').removeChild(jt);
+		}
+		
+		var st = document.getElementById('d_st').value;
+		var et = document.getElementById('d_et').value;
+		
+		
+		var url = "/test/xls/"+st+"/"+et
+		alert(url)
+		Ajax.get(url,json2excel);
+	};
+
+	window.onload = function () {
+		document.getElementById('btntable').onclick=fn_table;
+		document.getElementById('btnexcle').onclick=fn_excle;
+	}	
+	
+    </script>
+</head>
+<body>
+<!--   
+<div>
+	开始时间:<input id="d_st" type="date"/>结束时间:<input id="d_et" type="date"/>  <label id="btntest">查询</label>
+</div>
+<div id="jsontable"></div>
+-->	
+<div id="wrap">  
+        <div id="header">header</div>  
+        <div id="container">  
+            <div id="left_side">left_side</div>  
+			<div id="content_test_bar">
+			开始日期:<input id="d_st" type="date"/>&nbsp;&nbsp;结束日期:<input id="d_et" type="date"/>&nbsp;&nbsp;<label id="btntable">查询</label>&nbsp;&nbsp;<label id="btnexcle">导出</label>
+			</div>  
+            <div id="content_test"><div id="jsontable"></div></div>  
+			<!--
+            <div id="right_side">right-side</div>  
+			-->
+        </div>  
+		<!--
+        <div id="footer">footer</div>  
+		-->
+    </div>  
+	
+</body>
+</html>
