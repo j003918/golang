@@ -1,17 +1,23 @@
-<!DOCTYPE HTML>
+<!DOCTYPE html>
 <html>
-  <head>
-    <meta charset="UTF-8" />
-	<script type="text/javascript" src="http://lib.sinaapp.com/js/jquery/1.9.1/jquery-1.9.1.min.js"></script>
-<script type="text/javascript">$(function() {
+ <head> 
+  <meta charset="UTF-8" /> 
+  <script type="text/javascript" src="js/jquery1.9.1.min.js"></script> 
+  <script type="text/javascript">
+  function ajax_err(){
+	window.location.href="/home/";
+  }
+
+  $(function() {
     $(document).ready(function() {
       $("#frmMain").attr("action", "/tf" + window.location.search);
       $('#txt_diag').on('input propertychange',
       function() {
         $.ajax({
           type: "GET",
-          url: "/his/diag/" + $("#txt_diag").val(),
-          data: window.location.search.substr(1),
+          url: "/his/diag/" +encodeURI($("#txt_diag").val())+window.location.search,
+		  dataType: 'json',
+		  error:ajax_err,
           success: function(data) {
             $("#diagnosis").empty();
             //var option = $("<option>").val(1).text("pxx"); 
@@ -28,8 +34,9 @@
     $("#btnquery").click(function() {
       $.ajax({
         type: "GET",
-        url: "/his/pid/" + $("#pid").val(),
-        data: window.location.search.substr(1),
+        url: "/his/pid/" + $("#pid").val()+window.location.search,
+		dataType: 'json',
+		error:ajax_err,
         success: function(data) {　　　　$("#txt_name").attr("value", data.name);
           $("#txt_sex").attr("value", data.sex);
           $("#txt_tel").attr("value", data.tel);
@@ -39,8 +46,9 @@
 
       $.ajax({
         type: "GET",
-        url: "/his/doctor",
-        data: window.location.search.substr(1),
+        url: "/his/doctor"+window.location.search,
+		dataType: 'json',
+		error:ajax_err,
         success: function(data) {
           $("#order_doctor").empty();
           //var option = $("<option>").val(1).text("pxx"); 
@@ -54,11 +62,9 @@
 
     });
   });
-</script>
-	
-	
-    <title>常州市中医医院夏季养生贴敷登记记录</title>
-    <style>
+</script> 
+  <title>常州市中医医院夏季养生贴敷登记记录</title> 
+  <style>
 		html { 
 		background-color: #E9EEF0; 
 		font-size:18px; 
@@ -70,124 +76,126 @@
 		border:1px solid #690; 
 		} 
 		.panel dl{float:left;}
-	</style>
-  </head>
-  <body>
-	<h1 align="center">常州市中医医院夏季养生贴敷登记记录</a></h1>
-	<div class="panel">
+	</style> 
+ </head> 
+ <body> 
+  <h1 align="center">常州市中医医院夏季养生贴敷登记记录</h1> 
+  <div class="panel">
 	姓名:&nbsp;&nbsp;<input type="text" id="txt_name" name="txt_name" value="" disabled="disabled" />
-	性别:&nbsp;&nbsp; <input type="text" id="txt_sex" name="txt_sex" value="" disabled="disabled"/>
-	年龄:&nbsp;&nbsp;<input type="text" id="txt_age" name="txt_age" value="" disabled="disabled"/>
-	<!--
+	性别:&nbsp;&nbsp;<input type="text" id="txt_sex" name="txt_sex" value="" disabled="disabled" />
+	年龄:&nbsp;&nbsp;<input type="text" id="txt_age" name="txt_age" value="" disabled="disabled" />
+   	<!--
 	<br><br>
 	家庭住址: <input type="text" id="txt_addr" name="txt_addr" value="" disabled="disabled"/>
 	-->
-	联系电话:&nbsp;&nbsp;<input type="text" id="txt_tel" name="txt_tel" value="" disabled="disabled"/>
-    </div>
-	
-	
-    <form id="frmMain" action="/tf" method="post">
-	<div class="panel">
-	ID:&nbsp;&nbsp;<input type="text" name="pid" id="pid" value="" />
-	<input type="button" id="btnquery" name="btnquery" value="查询">
-	</div>
-
-	<div class="panel">
-	主要诊断:&nbsp;&nbsp;<input type="text" id="txt_diag" value="" /><select name = "diagnosis" id="diagnosis" >
-	<option value ="-1" selected>请选择</option>
+	联系电话:&nbsp;&nbsp;<input type="text" id="txt_tel" name="txt_tel" value="" disabled="disabled" /> 
+  </div> 
+  <form id="frmMain" action="/tf" method="post"> 
+   <div class="panel">
+     ID:&nbsp;&nbsp;<input type="text" name="pid" id="pid" value="" /><input type="button" id="btnquery" name="btnquery" value="查询" /> 
+   </div> 
+   <div class="panel">
+	主要诊断:&nbsp;&nbsp;<input type="text" id="txt_diag" value="" />
+    <select name="diagnosis" id="diagnosis"> <option value="-1" selected="">请选择</option> </select>
+	开单医生:&nbsp;&nbsp;<select name="order_doctor" id="order_doctor"><option value="-1" selected="">请选择</option></select>
+	贴敷年限:&nbsp;&nbsp;
+	<select name="cure_period" id="cure_period">
+		<option value="-1" selected="">请选择</option>
+		<option value="1">第1年</option>
+		<option value="2">第2年</option>
+		<option value="3">第3年</option>
+		<option value="4">第4年</option>
+		<option value="5">第5年</option>
+		<option value="6">第6年</option>
+		<option value="7">第7年</option>
+		<option value="8">第8年</option>
+		<option value="9">第9年</option>
+		<option value="10">第10年</option>
+		<option value="11">第11年</option>
+		<option value="12">第12年</option>
+		<option value="13">第13年</option>
+		<option value="14">第14年</option>
+		<option value="15">第15年</option>
+		<option value="16">第16年</option>
+		<option value="17">第17年</option>
+		<option value="18">第18年</option>
+		<option value="19">第19年</option>
+		<option value="20">第20年</option>
+	</select> 
+   </div> 
+   <div class="panel">
+	治疗次数:&nbsp;&nbsp;
+    <select name="cnt" id="cnt">
+		<option value="-1" selected="">请选择</option>
+		<option value="1">1次</option>
+		<option value="2">2次</option>
+		<option value="3">3次</option>
+		<option value="4">4次</option>
+		<option value="5">5次</option>
+		<option value="6">6次</option>
+		<option value="7">7次</option>
+		<option value="8">8次</option>
+		<option value="9">9次</option>
+		<option value="10">10次</option>
 	</select>
-	开单医生:&nbsp;&nbsp;<select name = "order_doctor" id="order_doctor"><option value ="-1" selected>请选择</option></select>
-	贴敷年限:&nbsp;&nbsp;<select name = "cure_period" id="cure_period">
-		<option value ="-1" selected>请选择</option>
-		<option value ="1">第1年</option>
-  		<option value ="2">第2年</option>
-  		<option value ="3">第3年</option>
-  		<option value ="4">第4年</option>
-		<option value ="5">第5年</option>
-  		<option value ="6">第6年</option>
-  		<option value ="7">第7年</option>
-  		<option value ="8">第8年</option>
-		<option value ="9">第9年</option>
-  		<option value ="10">第10年</option>
-  		<option value ="11">第11年</option>
-  		<option value ="12">第12年</option>
-		<option value ="13">第13年</option>
-  		<option value ="14">第14年</option>
-  		<option value ="15">第15年</option>
-  		<option value ="16">第16年</option>
-		<option value ="17">第17年</option>
-  		<option value ="18">第18年</option>
-  		<option value ="19">第19年</option>
-  		<option value ="20">第20年</option>
+	使用方:&nbsp;&nbsp;
+    <select name="presc" id="presc">
+		<option value="-1" selected="">请选择</option>
+		<option value="1">咳喘方</option>
+		<option value="2">虚体感冒方</option>
+		<option value="3">暖宫方</option>
+		<option value="4">胃痛方</option>
+		<option value="5">自汗方</option>
+		<option value="6">盗汗方</option>
+		<option value="7">消癥方</option>
+		<option value="8">过敏性鼻炎方</option>
+		<option value="9">慢性腹泻方</option>
+		<option value="10">癃闭方</option>
+		<option value="11">痹证方</option>
+		<option value="12">过敏性结膜炎方</option>
 	</select>
-    </div>
-    <div class="panel">
-	治疗次数:&nbsp;&nbsp;<select name = "cnt" id="cnt">
-		<option value ="-1" selected>请选择</option>
-		<option value ="1">1次</option>
-  		<option value ="2">2次</option>
-  		<option value ="3">3次</option>
-  		<option value ="4">4次</option>
-		<option value ="5">5次</option>
-  		<option value ="6">6次</option>
-  		<option value ="7">7次</option>
-  		<option value ="8">8次</option>
-		<option value ="9">9次</option>
-  		<option value ="10">10次</option>
+	取穴:&nbsp;&nbsp;
+    <select name="points" id="points">
+		<option value="-1" selected="">请选择</option>
+		<option value="1">常规取穴</option>
+		<option value="2">特殊取穴</option>
 	</select>
-	使用方:&nbsp;&nbsp;<select name = "presc" id="presc">
-		<option value ="-1" selected>请选择</option>
-		<option value ="1">咳喘方</option>
-  		<option value ="2">虚体感冒方</option>
-  		<option value ="3">暖宫方</option>
-  		<option value ="4">胃痛方</option>
-		<option value ="5">自汗方</option>
-  		<option value ="6">盗汗方</option>
-  		<option value ="7">消癥方</option>
-  		<option value ="8">过敏性鼻炎方</option>
-		<option value ="9">慢性腹泻方</option>
-  		<option value ="10">癃闭方</option>
-		<option value ="11">痹证方</option>
-		<option value ="12">过敏性结膜炎方</option>
+	贴敷后反应:&nbsp;&nbsp;
+    <select name="reaction" id="reaction">
+		<option value="-1" selected="">请选择</option>
+		<option value="1">皮肤正常</option>
+		<option value="2">局部皮肤发红</option>
+		<option value="3">局部皮肤出现红斑</option>
+		<option value="4">局部皮肤出现小水泡</option>
+		<option value="5">局部皮肤出现大水泡</option>
+		<option value="6">出现全身过敏性反应</option>
+		<option value="7">其它</option>
 	</select>
-	取穴:&nbsp;&nbsp;<select name = "points" id="points">
-		<option value ="-1" selected>请选择</option>
-		<option value ="1">常规取穴</option>
-  		<option value ="2">特殊取穴</option>
+	特殊处理:&nbsp;&nbsp;
+    <select name="dispose" id="dispose">
+		<option value="-1" selected="">请选择</option>
+		<option value="1">暂停贴敷</option>
+		<option value="2">局部换药处理</option>
+		<option value="3">专科就诊</option>
 	</select>
-	贴敷后反应:&nbsp;&nbsp;<select name = "reaction" id="reaction">
-		<option value ="-1" selected>请选择</option>
-		<option value ="1">皮肤正常</option>
-  		<option value ="2">局部皮肤发红</option>
-  		<option value ="3">局部皮肤出现红斑</option>
-  		<option value ="4">局部皮肤出现小水泡</option>
-		<option value ="5">局部皮肤出现大水泡</option>
-  		<option value ="6">出现全身过敏性反应</option>
-  		<option value ="7">其它</option>
-	</select>
-	特殊处理:&nbsp;&nbsp;<select name = "dispose" id="dispose">
-		<option value ="-1" selected>请选择</option>
-		<option value ="1">暂停贴敷</option>
-  		<option value ="2">局部换药处理</option>
-  		<option value ="3">专科就诊</option>
-	</select>
-	随访纪录:&nbsp;&nbsp;<select name = "flup" id="flup">
-		<option value ="-1" selected>请选择</option>
-		<option value ="1">门诊随访</option>
-  		<option value ="2">电话随访</option>
-  		<option value ="3">未随访</option>
-		<option value ="3">其它</option>
-	</select>
-	</div>
-	<div class="panel">
-	备注:&nbsp;&nbsp;<textarea cols="100" rows="5" style="resize: none;" name="remarks" id="remarks"></textarea>
-	</div>
-	
-	<div class="panel">
-        <div style="text-align:center;">
-          <input type="submit" value="提交"></div>
-    </div>
-    </form>
-  </body>
-
+	随访纪录:&nbsp;&nbsp;
+    <select name="flup" id="flup">
+		<option value="-1" selected="">请选择</option>
+		<option value="1">门诊随访</option>
+		<option value="2">电话随访</option>
+		<option value="3">未随访</option>
+		<option value="3">其它</option> 
+	</select> 
+   </div> 
+   <div class="panel">
+     备注:&nbsp;&nbsp;
+    <textarea cols="100" rows="5" style="resize: none;" name="remarks" id="remarks"></textarea> 
+   </div> 
+   <div class="panel"> 
+    <div style="text-align:center;"> 
+     <input type="submit" value="提交" />
+    </div> 
+   </div> 
+  </form>   
+ </body>
 </html>

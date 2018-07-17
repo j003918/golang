@@ -15,9 +15,8 @@ func xjtf(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 	for k, v := range r.Form {
 		log.Println(k, v)
 	}
-
 	strMsg := "添加成功!"
-	strRspHtml := `<html><body> <div style="text-align:center;"><br><br><br><br><br><br>` + strMsg + `<br><a href="home/xjys.html?"` + r.URL.RawQuery + `>返回</a></div></body></html>`
+	strRspHtml := `<html><body> <div style="text-align:center;"><br><br><br><br><br><br>` + strMsg + `<br><a href="home/xjys.html?` + r.URL.RawQuery + `">返回</a></div></body></html>`
 	w.Write([]byte(strRspHtml))
 }
 
