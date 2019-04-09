@@ -35,6 +35,13 @@ www.88dushu.com:
   menuList: "div.mulu ul li a"
   chtTitle: "div.novel h1"
   chtContent: "div.yd_text2"
+www.88dus.com:
+  wetsite: "www.88dus.com"
+  charset: "gbk"
+  novelName: "div.rt h1"
+  menuList: "div.mulu ul li a"
+  chtTitle: "div.novel h1"
+  chtContent: "div.yd_text2"
 www.biqudao.com:
   wetsite: "www.biqudao.com"
   charset: "utf-8"

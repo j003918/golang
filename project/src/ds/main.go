@@ -50,8 +50,8 @@ var (
 )
 
 func init() {
-	his = NewHIS()
-	smgr = session.NewSessionMgr()
+	//his = NewHIS()
+	//smgr = session.NewSessionMgr()
 }
 
 func main() {

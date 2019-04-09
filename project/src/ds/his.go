@@ -7,8 +7,7 @@ import (
 	"dbs"
 	"log"
 	"strings"
-
-	_ "github.com/mattn/go-oci8"
+	//_ "github.com/mattn/go-oci8"
 )
 
 //var HIS_DB *sql.DB
