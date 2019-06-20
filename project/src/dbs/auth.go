@@ -14,15 +14,43 @@ type Conf struct {
 	Method string // 加密算法
 	Key    string // 加密key
 	Issuer string // 签发者
-	Expire int64  // 签名有效期
+	Expire int64  // 签名有效期(分钟)
 }
 
 var jwsConf = Conf{
 	Method: "HS256",
 	Key:    `ddFVDS|{}PDSOIU@$@!!#$$^&^&$`,
-	Issuer: "sesan",
-	Expire: 5,
+	Issuer: "jianghaifeng",
+	Expire: 15,
 }
+
+// var tokenCache sync.Map
+
+// func init() {
+// 	go checkToken()
+// }
+
+// func checkToken() {
+// 	timer := time.NewTicker(time.Second * 10)
+// 	for {
+// 		select {
+// 		case <-timer.C:
+// 			tokenAging()
+// 		}
+// 	}
+// }
+
+// func tokenAging() {
+// 	r := func(k, v interface{}) bool {
+// 		if time.Now().Unix()-v.(int64) >= 60 {
+// 			tokenCache.Delete(k)
+// 			log.Println("Aging token", k.(string))
+// 			return true
+// 		}
+// 		return false
+// 	}
+// 	tokenCache.Range(r)
+// }
 
 func getJWS(data map[string]interface{}) (token string, err error) {
 	payload := jws.Claims{}
@@ -53,6 +81,10 @@ func VerifyJWT(token string) (ret bool, err error) {
 		ret = true
 	}
 	return
+}
+
+func refreshToken(oldToken string) string {
+	return ""
 }
 
 func checkUser(account, password string) bool {
@@ -86,6 +118,7 @@ func login(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	//	tokenCache.Store(strJWT, time.Now().Unix())
 	w.Header().Set("Access-Control-Allow-Origin", "*")
 	w.Header().Set("Cache-Control", "no-store")
 	w.Header().Set("Content-Type", "application/json;charset=utf-8")
